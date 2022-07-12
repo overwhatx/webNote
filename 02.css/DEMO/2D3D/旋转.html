@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        html {
+            perspective: 1000px;
+        }
+
+        .box1 {
+            width: 200px;
+            height: 200px;
+            background: #bfd;
+            margin: 100px auto;
+            animation: test 2s infinite;
+
+        }
+
+        @keyframes test {
+            0% {
+                transform: rotateY(0deg);
+            }
+
+            100% {
+                transform: rotateY(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box1">
+        Lorem ipsum dolor sit amet.
+    </div>
+</body>
+
+</html>

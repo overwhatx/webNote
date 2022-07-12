@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        .button button {
+            float: left;
+            display: block;
+            width: 100px;
+            border-radius: 10px;
+            background: aquamarine;
+            text-align: center;
+            color: #c92056;
+            margin-right: 5px;
+        }
+
+        button[id] {
+            background: yellow;
+        }
+
+        button[name*="na"] {
+            background: darkblue;
+        }
+
+        button[class$="b1"] {
+            background: darkorchid;
+        }
+    </style>
+
+<body>
+    <form class="button">
+        <button class="links b1" id="first" name="na gg">按钮1</button>
+        <button class="link  b1" id="first ff" name="na gg">按钮2</button>
+        <button class="links b2" id="first fff" name="na gg1">按钮3</button>
+        <button class="links b1" name="na gg">按钮4</button>
+        <button class="link b2" id="first dd" name="gg1">按钮5</button>
+        <button class="link sb1" id="first ddd" name="n gg">按钮6</button>
+        <button class="links b2" id="first dddd" name="na gg2">按钮7</button>
+    </form>
+
+
+
+</body>
+
+</html>

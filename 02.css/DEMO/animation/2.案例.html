@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .box1 {
+            width: 132px;
+            height: 271px;
+            margin: 0 auto;
+            background: url(img/1.png) no-repeat;
+            background-position: 0 0;
+            /* transition-property: background-position;
+            transition-duration: 0.5s;
+            transition-timing-function: steps(3); */
+            transition: steps(3) 0.5s;
+            /* 不写需要过渡的名字=all */
+
+        }
+
+        .box1:hover {
+            background-position: -396px 0px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box1"></div>
+
+</body>
+
+</html>

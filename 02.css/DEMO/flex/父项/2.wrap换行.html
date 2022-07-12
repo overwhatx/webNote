@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .container {
+            background: lime;
+            display: flex;
+
+            width: 300px;
+            height: 800px;
+            flex-wrap: nowrap;
+            flex-wrap: wrap;
+            flex-wrap: wrap-reverse;
+
+            /* 
+            nowrap	（默认值）不换行 自适应
+            wrap	宽度超过父级 换行
+            wrap-reverse	宽度超过父级 换行 但是以相反的顺序。
+            
+            
+            */
+
+        }
+
+        .container .items {
+            font-weight: 900;
+            font-size: 50px;
+            text-align: center;
+            line-height: 100px;
+            width: 100px;
+            height: 100px;
+            background: lightseagreen;
+            margin: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="box1 items">1</div>
+        <div class="box2 items">2</div>
+        <div class="box3 items">3</div>
+        <div class="box4 items">4</div>
+        <div class="box5 items">5</div>
+        <div class="box6 items">6</div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .container {
+            background: lightcoral;
+            border: 1px solid lightgreen;
+            display: flex;
+        }
+
+        .container div {
+            height: 200px;
+            margin-right: 5px;
+            background: #008c8c;
+
+            /* width值大于flex-basis值 使用 width值并固定 */
+            /* flex-basis值大于width值 使用 flex-basis值并固定 */
+
+            /* width: 200px; */
+            /* 只写 flex-basis 根据内容变化*/
+            flex-basis: 200px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="items">aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</div>
+
+
+    </div>
+</body>
+
+</html>

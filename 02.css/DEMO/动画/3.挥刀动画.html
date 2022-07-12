@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .box1 {
+            width: 113px;
+            height: 150px;
+            margin: 0 auto;
+            background: url(img/spriteAnimation.png);
+            animation: test 0.5s infinite steps(6);
+        }
+
+        @keyframes test {
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: -680px 0px;
+            }
+
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box1"></div>
+    <div class="box1"></div>
+    <div class="box1"></div>
+    <div class="box1"></div>
+
+</body>
+
+</html>

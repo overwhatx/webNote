@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .styles {
+            display: flex;
+            background: #008c8c;
+            margin-bottom: 10px;
+        }
+
+        .styles div {
+            width: 200px;
+            height: 100px;
+            background: chartreuse;
+        }
+
+        .styles div:nth-child(1) {
+            line-height: 100px;
+            text-align: center;
+        }
+
+        .container1 {
+            justify-content: start;
+        }
+
+        .container2 {
+            justify-content: flex-end;
+        }
+
+        .container3 {
+            justify-content: center;
+        }
+
+        .container4 {
+            justify-content: space-between;
+        }
+
+        .container5 {
+            justify-content: space-around;
+        }
+
+        .container6 {
+            justify-content: space-evenly;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container1 styles">
+        <div class="items"> flex-start</div>
+        <div class="items">2</div>
+        <div class="items">3</div>
+        <div class="items">4</div>
+    </div>
+    <div class="container2 styles">
+        <div class="items"> flex-end</div>
+        <div class="items">2</div>
+        <div class="items">3</div>
+        <div class="items">4</div>
+    </div>
+    <div class="container3 styles">
+        <div class="items"> center</div>
+        <div class="items">2</div>
+        <div class="items">3</div>
+        <div class="items">4</div>
+    </div>
+    <div class="container4 styles">
+        <div class="items"> space-between</div>
+        <div class="items">2</div>
+        <div class="items">3</div>
+        <div class="items">4</div>
+    </div>
+    <div class="container5 styles">
+        <div class="items"> space-around</div>
+        <div class="items">2</div>
+        <div class="items">3</div>
+        <div class="items">4</div>
+    </div>
+    <div class="container6 styles">
+        <div class="items"> space-evenly</div>
+        <div class="items">2</div>
+        <div class="items">3</div>
+        <div class="items">4</div>
+    </div>
+</body>
+
+</html>

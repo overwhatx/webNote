@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        div {
+            width: 200px;
+            height: 50px;
+            background: #008c8c;
+            line-height: 50px;
+            margin: 10px 0;
+            transition: width 2s;
+        }
+
+        div:hover {
+            width: 500px;
+        }
+
+        .box1 {
+            transition-timing-function: linear;
+        }
+
+        .box2 {
+            transition-timing-function: ease;
+        }
+
+        .box3 {
+            transition-timing-function: ease-in;
+        }
+
+        .box4 {
+            transition-timing-function: ease-out;
+        }
+
+        .box5 {
+            transition-timing-function: ease-in-out;
+        }
+
+        .box6 {
+            transition-delay: 2s;
+            transition-timing-function: cubic-bezier(0, 0, 1, 1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box1">linear</div>
+    <div class="box2">ease</div>
+    <div class="box3">ease-in</div>
+    <div class="box4">ease-out</div>
+    <div class="box5">ease-in-out</div>
+    <div class="box6">cubic-bezier(n,n,n,n)</div>
+</body>
+
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .box1 {
+            width: 132px;
+            height: 271px;
+            margin: 0 auto;
+            background: url(img/1.png);
+            animation: test2 4s forwards, test 0.5s infinite steps(4);
+
+        }
+
+        @keyframes test {
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: -528px 0px;
+            }
+
+        }
+
+        @keyframes test2 {
+            0% {
+                margin-left: 0;
+            }
+
+            100% {
+                margin-left: 1000px;
+            }
+
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box1"></div>
+
+</body>
+
+</html>

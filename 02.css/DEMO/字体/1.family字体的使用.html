@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        /* p {
+            font-family: 华文彩云, 微软雅黑;
+        } */
+
+        /*1. font-family使用规则：可以填写多个字体 靠前的字体权重高于后面的字体 同时需要判定当前用户电脑中是否存在该
+        字体，不存在则依次往后推 */
+        /* 2.需要注意的是 有些字体只对中或英文有效，所以存在一行中英混合文本会使用了两种指定字体 */
+        /* 3.字体分成5大类：
+        serif（衬线字体）
+        sans-serif （非衬线字体）
+        monospace （等宽字体）
+        cursive （草书字体）
+        fantasy （虚幻字体）
+        将字体设置为这些分类，浏览器会自动从这些分类里面选择指定的字体并应用
+        作用：兜底 常常写在 font-family属性 最后面
+        4.font类型的简写 ：没有严格顺序,属性之间使用空格隔开 但是 文字大小和文字字体必须写 否则 全无效而且 文字字体必须最后写 字体大小写在倒数第二位
+         （可以设置： 字体大小 小写大字母 斜体 加粗 字体类型 ）
+        font-variant: small-caps;（小写大字母）
+        5.font中可以写行高  font: 30px/50px "华文彩云";  行高书写于字体大小后面使用 “/” 斜杠隔开
+        */
+
+        .test {
+            font: bold small-caps italic 30px/50px "华文彩云";
+
+        }
+    </style>
+</head>
+
+<body>
+    <p style="font-family: serif;">
+        这是一段在p中的文字：Lorem ipsum dolor sit amet.
+    </p>
+    <p style="font-family: sans-serif;">
+        这是一段在p中的文字：Lorem ipsum dolor sit amet.
+    </p>
+    <p style="font-family: monospace;">
+        这是一段在p中的文字：Lorem ipsum dolor sit amet.
+    </p>
+    <p style="font-family: cursive;">
+        这是一段在p中的文字：Lorem ipsum dolor sit amet.
+    </p>
+    <p style="font-family: fantasy;">
+        这是一段在p中的文字：Lorem ipsum dolor sit amet.
+    </p>
+
+    <p class="test">
+        这是一段在p中的文字：ABCDabcd.
+    </p>
+</body>
+
+</html>

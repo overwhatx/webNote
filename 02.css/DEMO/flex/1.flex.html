@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .container {
+            background: lightcoral;
+            border: 1px solid lightgreen;
+            display: flex;
+            /* 子元素的排列方向 */
+            /* flex-direction: row; */
+            /* 默认从左到右 */
+            /* flex-direction: row-reverse; */
+            /* 从右到左 */
+            /* flex-direction: column; */
+            /* 从上到下 */
+            /* flex-direction: column-reverse; */
+            /* 从下到上 */
+
+            /* 换行 */
+            /* width: 500px; */
+            /* flex-wrap: nowrap; */
+            /* 默认不换行 */
+            /* flex-wrap: wrap; */
+            /* 换行 */
+            /* flex-wrap: wrap-reverse; */
+            /* 换行 同时倒序排列 */
+
+            /* 换行与排列方向的结合 */
+            /* flex-flow: row-reverse wrap ; */
+
+            /* justify  */
+            /* justify-content:flex-start;	（默认值） 子元素居左 */
+            /* justify-content: flex-end; 居右 */
+            /* justify-content: center; 居中 */
+            /* justify-content: space-between;  平均分 子元素与子元素之间的空白*/
+            /* justify-content: space-around; （围绕）元素与元素间 平均分 但是 元素第一位*/
+            /* justify-content: space-evenly; （均匀）每个元素的间隔一样*/
+
+        }
+
+        .container div {
+            width: 200px;
+            height: 200px;
+            /* margin-right: 5px; */
+            background: #008c8c;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="items">1</div>
+        <div class="items">2</div>
+        <div class="items">3</div>
+        <div class="items">4</div>
+        <div class="items">5</div>
+        <div class="items">6</div>
+    </div>
+</body>
+
+</html>

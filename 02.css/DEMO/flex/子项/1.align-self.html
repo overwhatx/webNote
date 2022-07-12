@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .container {
+            background: lightcoral;
+            border: 1px solid lightgreen;
+            display: flex;
+            align-items: center;
+            width: 800px;
+            height: 600px;
+        }
+
+        .container div {
+            width: 200px;
+            height: 200px;
+            background: #008c8c;
+            margin: 5px;
+
+        }
+
+        .items1 {
+            align-self: auto;
+        }
+
+        .items2 {
+            align-self: flex-start;
+            /* 纵轴开始位置 */
+        }
+
+        .items3 {
+            align-self: flex-end;
+            /*纵轴结束位置  */
+        }
+
+        .items4 {
+            align-self: stretch;
+            /*  */
+        }
+
+        .items5 {
+            align-self: baseline;
+        }
+
+        .items6 {
+            align-self: center;
+            /* 纵轴 居中 */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="items1">1</div>
+        <div class="items2">2</div>
+        <div class="items3">3</div>
+        <div class="items4">4</div>
+        <div class="items5">5</div>
+        <div class="items6">6</div>
+        <div class="items7">7</div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,77 @@
+html {
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    margin: 0;
+    padding-top: 24px;
+    /* 这是重点 */
+    height: 100%;
+    font-size: 0;
+    overflow: auto;
+    background-color: #f5f6fa;
+}
+
+.left-section {
+    display: inline-block;
+    width: 100px;
+    height: 300px;
+    background: #fff;
+}
+
+.right-section {
+    position: relative;
+    /* 这是重点 */
+    display: inline-block;
+    margin-left: 24px;
+    width: 300px;
+    font-size: 14px;
+    vertical-align: top;
+}
+
+.top-section {
+    height: 200px;
+    background: #fff;
+}
+
+.nav-bar-wrap {
+    margin: 16px 0;
+    height: 55px;
+}
+
+.nav-bar {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    border-radius: 5px;
+    background: #fff;
+    box-shadow: 0 1px 8px 4px rgba(0, 0, 0, .02);
+}
+
+.nav-bar li {
+    display: inline-block;
+    padding: 16px;
+    cursor: pointer;
+}
+
+.nav-bar li.active {
+    color: #387af6;
+    border-bottom: 2px solid #387af6;
+}
+
+.content1 {
+    height: 300px;
+    background: #fff;
+}
+
+.content2 {
+    margin: 16px 0;
+    height: 500px;
+    background: #fff;
+}
+
+.content3 {
+    height: 1000px;
+    background: #fff;
+}
