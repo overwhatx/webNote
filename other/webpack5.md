@@ -178,4 +178,63 @@ output: {
     clean:true,
   },
 ```
-##
+## 处理js资源
+- Webpack 对 js 处理是有限的，只能编译 js 中 ES 模块化语法，不能编译其他语法，导致 js 不能在 IE 等浏览器运行，所以我们希望做一些兼容性处理
+- 其次开发中，团队对代码格式是有严格要求的，我们不能由肉眼去检测代码格式，需要使用专业的工具来检测。
+- 针对 js 兼容性处理，可以使用 Babel 来完成
+- 针对代码格式，可以使用 Eslint 来完成
+- 先完成 Eslint，检测代码格式无误后，在由 Babel 做代码兼容性处理
+
+### Eslint
+- Eslint是用来检测 js 和 jsx 语法的工具，可以配置各项功能
+- Eslint官网：`https://eslint.bootcss.com/docs/user-guide/configuring`
+- 使用 Eslint，关键是写 Eslint 配置文件，里面写上各种 rules 规则，将来运行 Eslint 时就会以写的规则对代码进行检查
+#### 1. 配置文件
+- 配置文件由很多种写法：
+  - .eslintrc.*：新建文件，位于项目根目录
+  - .eslintrc
+  - .eslintrc.js
+  - .eslintrc.json
+- 区别在于配置格式不一样
+  - package.json 中 eslintConfig：不需要创建文件，在原有文件基础上写
+  - ESLint 会查找和自动读取它们，所以以上配置文件只需要存在一个即
+#### 2. 具体配置
+- .eslintrc.js 配置文件为例：
+```js
+module.exports = {
+  // 解析选项
+  parserOptions: {},
+  // 具体检查规则
+  rules: {},
+  // 继承其他规则
+  extends: [],
+  // ...
+  // 其他规则详见：https://eslint.bootcss.com/docs/user-guide/configuring
+};
+```
+- 1. parserOptions 解析选项
+```js
+  parserOptions: {
+    ecmaVersion: 6, // ES 语法版本
+    sourceType: "module", // ES 模块化
+    ecmaFeatures: { // ES 其他特性
+      jsx: true // 如果是 React 项目，就需要开启 jsx 语法
+    }
+  }
+```
+- 2. rules 具体规则
+  - "off" 或 0 - 关闭规则
+  - "warn" 或 1 - 开启规则，使用警告级别的错误：warn (不会导致程序退出)
+  - "error" 或 2 - 开启规则，使用错误级别的错误：error (当被触发的时候，程序会退出)
+  - 更多规则查阅官方文档:`https://eslint.bootcss.com/docs/rules/`
+
+#### 3. extends 继承
+- 开发中一点点写 rules 规则太费劲了，所以有更好的办法，继承现有的规则
+- 现有以下较为有名的规则：
+  - Eslint 官方的规则：eslint:recommended  :`https://eslint.bootcss.com/docs/rules/`
+  - Vue Cli 官方的规则：plugin:vue/essential :`https://github.com/vuejs/vue-cli/tree/dev/packages/@vue/cli-plugin-eslint`
+  - React Cli 官方的规则：react-app :`https://github.com/facebook/create-react-app/tree/main/packages/eslint-config-react-app`
+#### 在 Webpack 中使用 Eslint
+- 参考官方文档：https://webpack.docschina.org/plugins/eslint-webpack-plugin/
+- 安装：`npm install eslint-webpack-plugin eslint  --save-dev` (eslint-webpack-plugin 和 eslint )
+
