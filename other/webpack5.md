@@ -190,14 +190,14 @@ output: {
 - Eslint官网：`https://eslint.bootcss.com/docs/user-guide/configuring`
 - 使用 Eslint，关键是写 Eslint 配置文件，里面写上各种 rules 规则，将来运行 Eslint 时就会以写的规则对代码进行检查
 #### 1. 配置文件
-- 配置文件由很多种写法：
+- 配置文件有很多种写法：
   - .eslintrc.*：新建文件，位于项目根目录
   - .eslintrc
   - .eslintrc.js
   - .eslintrc.json
 - 区别在于配置格式不一样
   - package.json 中 eslintConfig：不需要创建文件，在原有文件基础上写
-  - ESLint 会查找和自动读取它们，所以以上配置文件只需要存在一个即
+  - ESLint 会查找和自动读取它们，所以以上配置文件只需要存在一个即可
 #### 2. 具体配置
 - .eslintrc.js 配置文件为例：
 ```js
@@ -227,14 +227,117 @@ module.exports = {
   - "warn" 或 1 - 开启规则，使用警告级别的错误：warn (不会导致程序退出)
   - "error" 或 2 - 开启规则，使用错误级别的错误：error (当被触发的时候，程序会退出)
   - 更多规则查阅官方文档:`https://eslint.bootcss.com/docs/rules/`
-
+```js
+  rules: {
+    semi: "error", // 禁止使用分号
+    'array-callback-return': 'warn', // 强制数组方法的回调函数中有 return 语句，否则警告
+    'default-case': [
+      'warn', // 要求 switch 语句中有 default 分支，否则警告
+      { commentPattern: '^no default$' } // 允许在最后注释 no default, 就不会有警告了
+    ],
+    eqeqeq: [
+      'warn', // 强制使用 === 和 !==，否则警告
+      'smart' // https://eslint.bootcss.com/docs/rules/eqeqeq#smart 除了少数情况下不会有警告
+    ],
+  }
+```
 #### 3. extends 继承
 - 开发中一点点写 rules 规则太费劲了，所以有更好的办法，继承现有的规则
 - 现有以下较为有名的规则：
   - Eslint 官方的规则：eslint:recommended  :`https://eslint.bootcss.com/docs/rules/`
   - Vue Cli 官方的规则：plugin:vue/essential :`https://github.com/vuejs/vue-cli/tree/dev/packages/@vue/cli-plugin-eslint`
   - React Cli 官方的规则：react-app :`https://github.com/facebook/create-react-app/tree/main/packages/eslint-config-react-app`
+
+```js
+// 例如在React项目中，我们可以这样写配置
+module.exports = {
+  extends: ["react-app"], //继承规则的名字 需要下载后使用 （eslint官方 配置不需要下载）
+  // 使用继承规则 有不需要的规则或需要改变的规则 可以在rules 中进行 覆盖设置
+  rules: {
+    // 我们的规则会覆盖掉react-app的规则
+    // 所以想要修改规则直接改就是了
+    eqeqeq: ["warn", "smart"],
+  },
+};
+```
 #### 在 Webpack 中使用 Eslint
 - 参考官方文档：https://webpack.docschina.org/plugins/eslint-webpack-plugin/
 - 安装：`npm install eslint-webpack-plugin eslint  --save-dev` (eslint-webpack-plugin 和 eslint )
+- 在 `webpack.config.js` 文件中进行引用 `const ESLintPlugin = require('eslint-webpack-plugin');`
+```js
+   // 插件
+  plugins: [
+    // plugins 配置
+    // new 调用eslint插件
+    new ESLintPlugin(
+      // 设置需要被检测的文件
+      {
+        context: path.resolve(__dirname, "src")
+      }
+    )
+  ],
+```
+- 在项目根目录创建文件 `.eslintrc.js` 进行eslint 配置
+```js
+module.exports = {
+  // 继承 Eslint 规则
+  extends: ["eslint:recommended"],
+  env: {
+    node: true, // 启用node中全局变量
+    browser: true, // 启用浏览器中全局变量
+  },
+  parserOptions: {
+    ecmaVersion: 6,//es6
+    sourceType: "module",//es module
+  },
+  rules: {
+    "no-var": 2, // 不能使用 var 定义变量
+  },
+};
+```
+- 在项目根目录创建文件 `.eslintignore` 配置 eslint 检查时要忽略的文件
+```js
+dist
+```
+### Babel
+- JavaScript 编译器
+- 主要用于将 ES6 语法编写的代码转换为向后兼容的 JavaScript 语法，以便能够运行在当前和旧版本的浏览器或其他环境中
+#### 1. 配置文件
+- 配置文件由很多种写法：
+ - babel.config.*：新建文件，位于项目根目录
+    - babel.config.js
+    - babel.config.json
+ - .babelrc.*：新建文件，位于项目根目录
+   - .babelrc
+   - .babelrc.js
+   - .babelrc.json
+ - package.json 中 babel：不需要创建文件，在原有文件基础上写
+   Babel 会查找和自动读取它们，所以以上配置文件只需要存在一个即可
+#### 2. 具体配置
+```js
+module.exports = {
+  // 预设
+  presets: [],
+};
+```
+- presets 预设
+  - 简单理解：就是一组 Babel 插件, 扩展 Babel 功能
+  - @babel/preset-env: 一个智能预设，允许您使用最新的 JavaScript。
+  - @babel/preset-react：一个用来编译 React jsx 语法的预设
+  - @babel/preset-typescript：一个用来编译 TypeScript 语法的预
+#### 在 Webpack 中使用 babel
 
+- 1.安装：`npm install -D babel-loader @babel/core @babel/preset-env webpack` (安装多个  已安装的无需在次安装)
+  - 地址：https://webpack.docschina.org/loaders/babel-loader#root
+- 2.定义 Babel 配置文件 根目录创建 `babel.config.js`文件
+  - 也可以写于 webpack.config.js 中 只是不利于修改
+```js
+module.exports = {
+  // 智能预设：能够编译 ES6的语法
+  presets: ["@babel/preset-env"],
+};
+
+
+```
+###
+###
