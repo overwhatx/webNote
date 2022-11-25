@@ -339,5 +339,188 @@ module.exports = {
 
 
 ```
-###
-###
+# 版本二
+### 安装配置 wepback
+- 1.初始化项目 npm init -y 安装webpack相关的包 ` npm i webpack webpack-cli -D`
+- 2.在项目根目录创建 webpack.config.js 的 webpack 配置文件
+  - 在 webpack.config.js 初始化基本配置
+    ```js
+    module.exports = {
+    // 编译模式
+    mode: 'development', //development 开发模式   production 上线模式
+    }
+    ```
+- 3.在package.json 配置文件中 scripts 节点下 新增 dev 脚本 dev并不是固定的 可以自定义的 但在运行的时候 也使用对应的名字
+  ```json
+    "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "webpack" //
+  },
+  ```
+- 4.运行 npm run dev  进行项目打包
+- 5.配置打包的入口与出口 
+  - 当不进行配置打包入口与出口的时候将使用默认的
+  -  webpack.config.js中进行配置
+    ```js
+    //配置修改打包的入口与出口
+    //首先需要在 module.exports 外引入 path 模块
+    const path = require('path'); //导入nodejs 操作 路径的模块
+
+    entry: path.join(__dirname, './src/index.js'), //打包入口文件路径
+    output: {
+        path: path.join(__dirname, './dist'), //输出文件路径
+        filename: 'aaa.js', //输出文件的名称
+    },
+    ```
+- 配置 自动打包功能
+  - 1.安装自动打包的工具 `npm i webpack-dev-server -D`
+  - 2.修改package.json 中scripts中的 dev 键名为 "webpack-dev-server" (将webpack 替换掉)
+  - 3.运行 npm run dev 点击控制台中输出的打开地址  出现一片文件 点击入口文件打开
+    - 打包生成的输出文件 默认放到了项目的根目录 但是虚拟的看不见
+    - 运行成功但是浏览器报 Cannot GET / 不显示页面 
+      - 解决方法：
+        ```js
+        //在webpack.config.js文件下的 module.exports中进行配置
+        //devServer.static该配置项允许配置从目录提供静态文件的选项（默认是 'public' 文件夹）。将其设置为 false 以禁用。
+        devServer: {
+        static: {
+            directory: path.join(__dirname, './'),
+            watch: true
+        }
+        },
+        ```
+- 配置 生成预览页面
+  - 1.安装插件 `npm html-webpack-plugin -D` 
+  - 2.在webpack.config.js文件添加配置
+    ```js
+    //1. module.exports 外添加
+    const plugin = require('html-webpack-plugin'); //生成预览页面的模块
+    const htmlPlugin = new plugin({     //创建插件的实例对象
+    template: './src/index.html',       //指定要用到的模板文件
+    filename: 'index.html'      //指定生成的文件名 该文件存在于内存中，在目录中不显示
+    })
+
+    //2.module.exports 内添加
+    //plugins 是 webpack打包用到的一系列插件列表
+    module.exports = {plugins: [htmlPlugin], }
+    ```
+- 配置 自动打包后 自动打开页面
+- 在 文件下 字段 值中 添加
+  - --open 打包完成后自动打开浏览器
+  - 配置IP地址
+  - 配置端口
+- demo
+  ```js
+     "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "webpack-dev-server --open --port 8888"
+  },
+  ```
+### package.json 文件 详情
+- package.json **是对项目或者模块包的描述**,里面包含许多元信息
+  - 文件里也包含里当前项目依赖了哪些第三方模块,这些项目依赖可分为项目依赖和开发依赖
+    - 项目依赖:在项目的开发阶段和线上运营阶段，依赖的第三方包，称为项目依赖
+      - 下载命令：npm install 包名 下载的文件会默认被添加到 package.json文件的dependencies 字段中 例如`npm install jquery`
+      - package.json文件中 多了一个dependencies 字段 项目依赖包名存放于此处
+    - 开发依赖：在项目的开发阶段需要依赖，线上运营阶段不需要依赖的第三方包，称为开发依赖
+      - 使用npm install 包名 --save-dev命令将包添加到package.json文件的devDependencies字段中
+      - package.json文件中 多了一个devDependencies 字段 开发依赖包名存放于此处
+- package-lock.json文件的作用
+  - 下载第三方依赖包时，会在项目根目录下生成一个package-lock.json文件package-lock.json这个文件会保存node_modules中所有包的信息
+  - 这个文件的主要作用是 锁定包的版本，确保再次下载时不会因为包版本不同而产生问题 (保留 package.json文件形式的下载)
+#### package.json 文件基础配置 详情
+```js
+    {
+  "name": "packss",     //项目名称  （名称和版本一起构成一个标识符，该标识符被认为是完全唯一的。）
+  "version": "1.0.0",   //版本号   （每次发布时version版本号不能与 已存在的版本号相同  否则服务器无法识别！！！）
+  "description": "",    //是一个字符串，用于编写描述信息。有助于人们在npm库中搜索的时候发现你的模块
+  "main": "index.js",   //指定了加载的入口文件，require导入的时候就会加载这个文件。这个字段的默认值是模块根目录下面的index.js
+  "scripts": {          // scripts：指定了运行脚本命令的npm命令行缩写
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "webpack-dev-server"
+  },
+  "keywords": [],       //keywords是一个字符串组成的数组，有助于人们在npm库中搜索的时候发现你的模块
+  "author": "",         //author是具体一个人 contributors表示一群人，他们都表示当前项目的共享者
+  "license": "ISC",     //是当前项目的协议，让用户知道他们有何权限来使用你的模块，以及使用该模块有哪些限制
+  "dependencies": {     //指定了项目运行所依赖的模块
+    "jquery": "^3.6.0"
+  },
+  "devDependencies": { //指定项目开发所需要的模块
+    "html-webpack-plugin": "^5.5.0",
+    "webpack": "^5.72.1",
+    "webpack-cli": "^4.9.2",
+    "webpack-dev-server": "^4.9.0"
+  }
+}
+```
+# vue 打包
+## yarn bulid 打包命令执行后的问题
+- 在没进行配置之前 打包的好的dist文件 直接进行运行 index.html 会出现404 问题
+- 原因：
+  - 默认打包 index.html 引入其他打包的文件使用的是绝对地址
+  - 地址是以/开头 （要找到当前index.html 打开时所在服务器的根地址 （文件夹））（使用vscode liserver打开时候 vscode根目录一定要是 dist）
+  - 但是因为 服务器上不可能只要一个项目 根目录不止一个项目
+- 解决：
+  - webpack 配置 publicPath - 控制index.html引入其他资源前缀地址
+  - 通过在 vue.config.js  脚手架配置文件 webpack配置文件
+  - publicPath 默认值为 '/'  在开发环境下一定是这个值，因为开发服务器会把所有打包放在内存里面 作为服务器的根目录文件夹， 绝对地址
+    - 当然也可以使用 ./ 但是为了严谨 就该在什么环境下使用什么方式
+  - 生产环境 上线 使用相对路径  publicPath:'./'
+  - 进行配置后 不会再以 / 开头  不写./ 表示为 相对路径 
+- 合理解决方式
+  - 场景：当生产环境和开发环境需要来回切换时 会显得格外麻烦
+  - 通过 node内置的环境变量  process.env.NODE_ENV  来判断当前 输入的命令
+  - 当输入命令为 yarn serve 那么 process.env.NODE_ENV的值就是 'development' 字符串
+  - 当输入命令为 yarn build 那么 process.env.NODE_ENV的值就是 'production' 字符串
+  - publicPath: process.env.NODE_ENV === 'production' ? './' : '/'
+## 如何减小 打包的体积
+- 打包时排除掉第三方包 使用CDN进行引入 使用
+  - 1.排除第三方配置  在 vue.config.js 中进行设置
+     ```js
+      configureWebpack: {
+      externals: {
+      // '包名':'在项目中引入的名字'
+      echarts: 'echarts',
+      vue: 'Vue',
+      'vue-router': 'VueRouter',
+      vuex: 'Vuex',
+      axios: 'axios',
+      // dayjs: 'dayjs',
+      'element-ui': 'ELEMENT',
+      // 'vue-quill-editor': 'VueQuillEditor',
+      // 'vuex-persistedstate': 'createPersistedState'
+      },
+    }
+     ```
+  - CDN
+    - 中文名为 内容分发网络 用于提高访问速度
+    - 把一些静态资源 css 、js 、图片、视频放在 第三方的CDN服务器上 可以加速访问速度
+    - 免费CDN 进行测试 地址：https://unpkg.com/
+    - 例子：https://unpkg.com/vue-router@3.5.1   https://unpkg.com/包名@版本号 回车查找获取整条路径
+      - <script src="https://unpkg.com/vue-router@3.5.1/dist/vue-router.js"></script> 存放于 index.html 文件中 在进行打包
+  - 当使用 CDN后  在生产环境下使用 也会进行引入在执行  比较缓慢 
+    - 解决：通过 判断 当前开发环境 是否使用 CDN加速  使用node内置的环境变量进行判断 ` process.env.NODE_ENV === 'production'`
+       ```js
+          //需要排除的包
+          let externals = {}
+          // 判断是否是生产环境
+          const isProduction = process.env.NODE_ENV === 'production'
+
+
+           // 如果是生产环境，组要执行以下逻辑
+            if (isProduction) {
+              externals = {
+                // '包名':'在项目中引入的名字'
+                // echarts: 'echarts',
+                // vuex: 'Vuex',
+                // dayjs: 'dayjs',
+                // 'vue-quill-editor': 'VueQuillEditor',
+                // 'vuex-persistedstate': 'createPersistedState',
+                'element-ui': 'ELEMENT',
+                'vue-router': 'VueRouter',
+                vue: 'Vue',
+                axios: 'axios',
+              }
+            }
+
+       ```
