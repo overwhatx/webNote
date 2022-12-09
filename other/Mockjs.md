@@ -1,6 +1,6 @@
 # MockJs
 - 官网地址：`http://mockjs.com/examples.html#Name`
-  - dithub:`https://github.com/nuysoft/Mock/wiki/Mock.mock()`
+  - github:`https://github.com/nuysoft/Mock/wiki/Mock.mock()`
 ## 在 vue 项目中使用 Mockjs
 - 安装依赖：`yarn add mockjs`
 - 创建文件、文件夹：src/mock/mock.js

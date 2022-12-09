@@ -497,7 +497,7 @@ module.exports = {
     - 把一些静态资源 css 、js 、图片、视频放在 第三方的CDN服务器上 可以加速访问速度
     - 免费CDN 进行测试 地址：https://unpkg.com/
     - 例子：https://unpkg.com/vue-router@3.5.1   https://unpkg.com/包名@版本号 回车查找获取整条路径
-      - <script src="https://unpkg.com/vue-router@3.5.1/dist/vue-router.js"></script> 存放于 index.html 文件中 在进行打包
+      - `<script src="https://unpkg.com/vue-router@3.5.1/dist/vue-router.js"></script>` 存放于 index.html 文件中 在进行打包
   - 当使用 CDN后  在生产环境下使用 也会进行引入在执行  比较缓慢 
     - 解决：通过 判断 当前开发环境 是否使用 CDN加速  使用node内置的环境变量进行判断 ` process.env.NODE_ENV === 'production'`
        ```js
