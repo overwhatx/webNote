@@ -108,3 +108,18 @@ function animal (name) {
   }
   animal('小狗')
 ```
+## 获取页面 滚动距离 可视区域 滚动条高度
+- 滚动距离 距离顶部的距离 从0 开始
+- 可视区域 浏览器可视窗口高度
+- 滚动条高度 滚动条整个高度
+  ```js
+    window.addEventListener("scroll", this.handleScroll, true);
+    function handleScroll() {
+    let scrollTop = document.getElementsByTagName("html")[0].scrollTop;
+    console.log("【滚动距离】", scrollTop);
+    let ch = document.getElementsByTagName("html")[0].clientHeight;
+    console.log("【可视区域】", ch);
+    let sh = document.getElementsByTagName("html")[0].scrollHeight;
+    console.log("【滚动条高度】", sh);
+    }
+  ```
