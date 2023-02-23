@@ -1,21 +1,39 @@
 # React
+## react 简介
+### 优点
+
+- 声明式
+  - 声明式编程是目前整个大前端开发的模式： Vue、 React、 Flutter、 SwiftUI
+  - 它允许我们只需要维护自己的状态， 当状态改变时， React可以根据最新的状态去渲染我们的UI界面
+- 组件化
+  - 组件化开发页面目前前端的流行趋势，将复杂的界面拆分成一个个小的组件
+  - 如何合理的进行组件的划分和设计是一个重点
+- 一次学习跨平台使用
+  - 2013年， React发布之初主要是开发Web页面
+  - 2015年， Facebook推出了ReactNative，用于开发移动端跨平台
+  - 2017年， Facebook推出ReactVR，用于开发虚拟现实Web应用程序
+
 ## 初识 react
+
+### 框架引入
+
 - 开发React必须依赖三个库 有顺序要求 必须先引入 react在引入react-dom
   - react: 包含react所必须的核心代码口
   - react-dom: react渲染在不同平台所需要的核心代码口
   - babel:将jsx转换成React代码的工具
-- 编写React的script代码中，必须添加 type="text/babel"，作用是可以让babel解析jsx的语法
+- **引入形式下，编写React的script代码中，script标签上必须添加 `<script type="text/babel"></script>` 作用是可以让babel解析jsx的语法**
 
 ### 创建第一个 react demo
+
 - React 18 之前使用: `ReactDOM.render(渲染的内容,渲染到什么位置)`
 - React 18: `const root = ReactDOM.createRoot(document.querySelector('#root')) root.render(<h2>hellow react18</h2>)`
-- 案例
+- 小案例
   ```html
     <body>
     <div id="root"></div>
     <div id="app"></div>
 
-    <script src="lib/react.js"></script>
+    <script src="lib/react.js"></>
     <script src="lib/react-dom.js"></script>
     <script src="lib/babel.js"></script>
     <script type="text/babel">
@@ -215,6 +233,7 @@
 ```
 
 ## JSX
+
 ### JSX 是什么
 - JSX是一种JavaScript的语法扩展 (eXtension)也在很多地方称之为JavaScript XML，因为看起就是一段XML语法
 -  它用于描述我们的UI界面，并且其完成可以和JavaScript融合在一起使用
@@ -389,6 +408,7 @@
 
   </script>
 ```
+
 ### 条件渲染
 ```js
 <script type="text/babel">
@@ -432,6 +452,7 @@
 
 </script>
 ```
+
 ### 列表渲染
 ```js
   <script type="text/babel">
@@ -529,6 +550,7 @@
   2.隐式绑定· 被一个对象执行 obj.foo()->obj
   3.显式绑定: call/apply/bind foo.call("aaa")->String("aaa")
   4.new绑定: newFoo()-创建一个新对象，并且赋值给this
+
 ### 解决this指向问题 this绑定方式
 - 方案一: bind给btnClick显示绑定this
 - 方案二: 使用 ES6 class fields 语法
