@@ -552,6 +552,7 @@
   4.new绑定: newFoo()-创建一个新对象，并且赋值给this
 
 ### 解决this指向问题 this绑定方式
+
 - 方案一: bind给btnClick显示绑定this
 - 方案二: 使用 ES6 class fields 语法
 - 方案三: 事件监听时传入箭头函数 (**推荐方式**)
@@ -616,10 +617,494 @@
 
 
 ## React 脚手架
+
 ### 安装创建脚手架
+
 - 全局安装脚手架 `npm i create-react-app -g`
 - 创建 `create-react-app projectName `
   - 项目名称不能包含大写字母
+
+## React 的组件化开发
+
+### 组件化开发思想
+
+- 将一个完整的页面分成很多个组件，每个组件都用于实现页面的一个功能块，而每一个组件又可以进行细分，而组件本身又可以在多个地方进行复用。
+- 组件化提供了一种抽象，让我们可以开发出一个个独立可复用的小组件来构造我们的应用，任何的应用都会被抽象成一颗组件树。
+- 有了组件化的思想，在之后的开发中就要充分的利用它尽可能的将页面拆分成一个个小的、可复用的组件，这样让我们的代码更加方便组织和管理，并且扩展性也更强。
+
+### **React的组件相对于Vue更加的灵活和多样，按照不同的方式可以分成很多类组件**
+
+- 根据组件的定义方式，可以分为:函数组件(Functional Component )和类组件(Class Component)
+- 根据组件内部是否有状态需要维护，可以分成: 无状态组件(Stateless Component)和有状态组件(Stateful Component)
+  - 一般函数式组件为无状态组件，类组件为有状态的组件
+- 根据组件的不同职责，可以分成: 展示型组件(Presentational Component)和容器型组件(Container Component)!
+- 这些概念有很多重叠，但是他们最主要是关注数据逻辑和UI展示的分离
+  - 函数组件、无状态组件、展示型组件主要关注UI的展示
+  - 类组件、有状态组件、容器型组件主要关注数据逻辑
+- 异步组件(待填坑)
+- 高阶组件(待填坑)
+
+### 类组件
+- 小案例
+  ```js
+    import { Component } from "react";
+    class App extends Component {
+      constructor() {
+        super()
+        this.state = {
+          message:'hello xbg'
+        }
+      }
+      render() {
+        const { message}=this.state
+        // return (
+        //   // 1. react 元素 通过jsx编写的代码就会被编译成 react.createElement 所以返回的就是一个 react 元素
+        //   <h2>{message}</h2>
+        // )
+        // 2.组件或者 fragments
+        // return ['a','b','c']
+        return [
+          <h1>H1</h1>,
+          <h2>H2</h2>,
+          <h3>H3</h3>
+        ]
+      }
+    }
+
+    export default App;
+  ```
+- 类组件的定义有如下要求
+  - 组件的名称是大写字符开头 (无论类组件还是函数组件)
+  - 类组件需要继承自 React.Component
+  - 类组件必须实现render函数
+- 使用class定义一个组件:
+  - constructor 是可选的，我们通常在 constructor 中初始化一些数据
+  - this.state 中维护的就是我们组件内部的数据
+  - render() 方法是 class 组件中唯一必须实现的方法
+- 导出导入方式
+  ```js
+  // 导入方式1  引入时 只能使用默认导出
+  import React from "react";
+  class App extends React.Component{
+  }
+  export default App;
+
+  // 导入方式2 引入时 可以使用默认导出也可以使用选择导出  （vscode 安装插件后 rce快捷生成）
+  import React, { Component } from 'react'
+  export class App_class extends Component {
+    render() {
+      return (
+        <div>App_class</div>
+      )
+    }
+  }
+  export default App_class
+  ```
+#### 函数的返回值
+- 当render 被调用时，它会检查 this.props 和 this.state 的变化并返回以下类型之一:
+  - React 元素 （通过jsx创建的元素就是 react元素 React.createElement()）
+- 数组或 fragments:使得 render 方法可以返回多个元素
+- Portals:可以渲染子节点到不同的 DOM子树中
+- 字符串或数值类型:它们在 DOM 中会被染为文本节点
+- 布尔类型或 null:什么都不渲染
+
+### 函数组件
+- 案例
+  ```js
+    function App () {
+      // 返回值 和类组件中的render 函数返回的是一致
+      return <h1>App_function</h1>
+    }
+    export default App
+  ```
+- 函数组件是使用function来进行定义的函数，只是这个函数会返回和类组件中 render 函数返回一样的内容
+- 函数组件有自己的特点 **没有hooks前提下的函数组件** （没有hooks之前的函数 就是一种展示型的函数，复杂的东西都使用类组件）
+  - 没有生命周期，也会被更新并挂载，但是没有生命周期函数
+  - this关键字不能指向组件实例(因为没有组件实例)
+  - 没有内部状态(state)
+
+## React 组件生命周期
+
+- 生命周期官方 图例：https://projects.wojtekmaj.pl/react-lifecycle-methods-diagram/
+- 生命周期和生命周期函数的关系： 生命周期是一个抽象的概念，在生命周期 的整个过程，分成了很多个阶段
+- **主要是类的生命周期，因为函数式组件是没有生命周期函数的** （当然也可以通过hooks来模拟一些生命周期的回调）
+
+### React生命周期示例
+
+```js
+  // App父组件
+  import React, { Component } from 'react'
+  import HelloWorld from './HelloWorld'
+  export class App extends Component {
+    constructor() {
+      super()
+      this.state = {
+        isShow:true
+      }
+    }
+    changeIsShow() {
+      this.setState({
+        isShow:!this.state.isShow
+      })
+    }
+    render() {
+      const {isShow }=this.state
+      return (
+        <div>
+       <button onClick={e=>this.changeIsShow()}>切换</button>
+       { isShow && <HelloWorld/>}
+        </div>
+      )
+    }
+  }
+  export default App
+
+  // 子组件
+  import React from 'react'
+  export class HelloWorld extends React.Component {
+    // 1.构造方法  constructor
+    constructor() {
+      console.log("1 constructor 构造方法");
+      super()
+      this.state={
+      message:'Hello World'
+      }
+    }
+
+    changeText() {
+      this.setState({message:'阿里嘎多美羊羊桑'})
+    }
+    // 2.执行 render 函数
+    render() {
+      console.log("2 render 函数");
+      const { message}=this.state
+      return (
+        <div>
+          <h2>{message}</h2>
+          <button onClick={e=> this.changeText()}>修改文本</button>
+        </div>
+      )
+    }
+    // 3. 组件被渲染到DOM 被挂载到 DOM
+    componentDidMount() {
+      console.log('3 componentDidMount 挂载到DOM');
+    }
+
+    // 4.组件被修改 DOM发生更新
+    componentDidUpdate() {
+      console.log('4 componentDidUpdate 组件被修改');
+    }
+    /* componentDidUpdate(a,b,c) {
+      console.log(a,b,c);
+    } */
+
+    // 组件被销毁 组件从DOM中卸载 从DOM移除
+    componentWillUnmount() {
+      console.log('5 componentWillUnmount 组件被销毁');
+
+    }
+
+  // ---------其他生命周期-------------
+  // 控制要不要重新执行render函数 返回false 就不会执行  返回true则反之
+  shouldComponentUpdate() {
+    return true
+  }
+  // 在 componentDidUpdate 之前执行 在更新之前将一些数据传递给更新后的组件componentDidUpdate(prevProps,PrevState,snapshot)
+  getSnapshotBeforeUpdate() {
+    return {
+      hobby:'唱跳rap篮球'
+    }
+  }
+  }
+  export default HelloWorld
+```
+- 执行流程 5个阶段
+  - 第一大阶段挂载：constructor 构造方法 --> render 函数 --> componentDidMount 挂载到DOM
+  - 第二大阶段更新：render 函数 --> componentDidUpdate 组件被修改
+  - 第三大阶段卸载：componentWillUnmount 组件被销毁
+
+### Constructor
+
+- 如果不初始化 state 或不进行方法绑定，则不需要为 React 组件实现构造函数
+- constructor中通常只做两件事情
+  - 通过给 this.state 赋值对象来初始化内部的state
+  - 为事件绑定实例（this）
+
+### render
+### componentDidMount
+
+- 会在组件挂载后（插入 DOM 树中）立即调用
+- 在此生命周期中通常进行的操作
+  - 依赖于DOM的操作可以在这里进行
+  - 在此处发送网络请求就最好的地方；（官方建议）
+  - 可以在此处添加一些订阅（会在componentWillUnmount取消订阅）
+
+### componentDidUpdate
+
+- 会在更新后会被立即调用，首次渲染不会执行此方法
+- 当组件更新后，可以在此处对 DOM 进行操作
+- 如果你对更新前后的 props 进行了比较，也可以选择在此处进行网络请求；（例如，当 props 未发生变化时，则不会执行网络请求）
+
+### componentWillUnmount
+
+- 会在组件卸载及销毁之前直接调用
+- 在此方法中执行必要的清理操作
+- 例如，清除 timer，取消网络请求或清除在 componentDidMount() 中创建的订阅等
+
+### 其他生命周期
+#### shouldComponentUpdate
+#### getDerivedStateFromProps
+- state 的值在任何时候都依赖于 props时使用；该方法返回一个对象来更新state
+#### getSnapshotBeforeUpdate
+- 在React更新DOM之前回调的一个函数，可以获取DOM更新前的一些信息（比如说滚动位置）；
+
+## React 组件间的通信
+- 父组件在展示子组件，可能会传递一些数据给子组件
+  - 父组件通过 属性=值 的形式来传递给子组件数据
+  - 子组件通过 props 参数获取父组件传递过来的数据
+### 父传子
+- 如果 constructor 中没有需要操作的事项 可以不写 在render函数中直接使用 this.pros 可以拿到父组件传递的值
+```js
+// 父组件
+import React, { Component } from 'react'
+import MainBanner from './MainBanner'
+import MainList from './MainList'
+export class Main extends Component {
+  constructor() {
+    super()
+    this.state = {
+      banners: ['唱', '跳', 'rap'],
+      productList:['张三','李四','王五']
+    }
+  }
+  render() {
+    const {banners,productList}=this.state
+    return (
+      <div>
+        <MainBanner banners={ banners} title='这是标题'/>
+        <MainList productList={ productList} title='卧龙凤雏'/>
+      </div>
+    )
+  }
+}
+export default Main
+// 子组件
+import React, { Component } from 'react'
+
+export class MainBanner extends Component {
+  constructor(props) {
+    // console.log(props);
+    super(props)
+  }
+  render() {
+    // 在这里也可以拿到 this.props
+    console.log(this.props);
+    const {banners,title}=this.props
+    return (
+      <div>
+        <h1>{ title}</h1>
+        <ul>
+          {
+            banners.map(item => {
+              return <li key={item}>{ item}</li>
+            })
+          }
+        </ul>
+      </div>
+    )
+  }
+}
+export default MainBanner
+
+
+// 子组件
+import React, { Component } from 'react'
+export class MainList extends Component {
+  // 其实也可以不写 constructor 直接使用 this.pros 使用父组件传递的值
+  render() {
+    const { productList,title}=this.props
+    return (
+      <div>
+        <h1>{ title}</h1>
+        <ul>
+          {
+            productList.map(item => {
+              return <li key={item}>{ item}</li>
+            })
+          }
+        </ul>
+      </div>
+    )
+  }
+}
+export default MainList
+```
+#### propTypes 类型校验
+
+- 对于传递给子组件的数据，有时候我们可能希望进行验证
+- 在没有使用Flow或者TypeScript 情况下 也可以通过 prop-types 库来进行类型验证
+- 从 React v15.5 开始，React.PropTypes 已移入另一个包中：prop-types 库
+  - 在使用前需要引入
+- 更多的验证方式，可以参考官网：https://zh-hans.reactjs.org/docs/typechecking-with-proptypes.html
+- 当类型校验不通过时会报警告
+  - Warning: Failed prop type: Invalid prop `title` of type `number` supplied to `MainBanner`, expected `string`
+- 校验示例
+  ```js
+  import React, { Component } from 'react'
+  // 1.引入校验
+  import PropTypes from 'prop-types'
+  export class MainBanner extends Component {
+    render() {
+      // 在这里也可以拿到 this.props
+      console.log(this.props);
+      const {banners,title}=this.props
+      return (
+        <div>
+          <h1>{ title}</h1>
+          <ul>
+            {
+              banners.map(item => {
+                return <li key={item.acm}>{ item.title}</li>
+              })
+            }
+          </ul>
+        </div>
+      )
+    }
+  }
+  // 2.对类型进行限制
+  MainBanner.propTypes = {
+  // array 类型  isRequired 为必填
+  banners: PropTypes.array.isRequired,
+  title:PropTypes.string.isRequired
+  }
+  export default MainBanner
+  ```
+- 设置默认参数
+  - **从 ES2022 开始，你也可以在 React 类组件中将 defaultProps 声明为静态属性**
+  ```js
+  import React, { Component } from 'react'
+  import PropTypes from 'prop-types'
+  export class MainList extends Component {
+  // 方式2 新特性
+  // 从 ES2022 开始，你也可以在 React 类组件中将 defaultProps 声明为静态属性。
+    static defaultProps= {
+      productList: [],
+      title:'默认标题'
+    }
+    render() {
+      const { productList,title}=this.props
+      return (
+        <div>
+          <h1>{ title}</h1>
+          <ul>
+            {
+              productList.map(item => {
+                return <li key={item.acm}>{ item.title}</li>
+              })
+            }
+          </ul>
+        </div>
+      )
+    }
+  }
+
+  // 限制类型
+  MainList.propTypes = {
+    productList: PropTypes.array,
+    title:PropTypes.string
+  }
+
+  // 方式1 设置默认值 (当没有传递值的时候使用默认值)
+  // MainList.defaultProps = {
+  //   productList: [],
+  //   title:'默认标题'
+  // }
+
+  export default MainList
+  ```
+
+### 子传父
+- 在React中同样是通过props传递消息，只是让父组件给子组件传递一个回调函数，在子组件中调用这个函数即可
+```js
+// 父组件
+import React, { Component } from 'react'
+import Header from './page/Header'
+import Footer from './page/Footer'
+export class App extends Component {
+  constructor() {
+    super()
+    this.state = {
+      counter:100
+    }
+  }
+  // 触发函数拿到返回的参数进行操作
+  changeCounter(count) {
+    this.setState({
+      counter:this.state.counter+count
+    })
+  }
+  reduceCounter(count) {
+    this.setState({
+      counter:this.state.counter-count
+    })
+  }
+  render() {
+    const { counter}=this.state
+    return (
+      <div>
+        <h1>计数：{ counter}</h1>
+        {/* 给子组件传递一个函数 触发函数并接收返回的值 */}
+        <Header AddClick={ (count)=>{this.changeCounter(count)}} />
+        <Footer reduceClick={(count) => { this.reduceCounter(count)}} />
+      </div>
+    )
+  }
+}
+export default App
+
+// Header 子组件
+import React, { Component } from 'react'
+
+export class Header extends Component {
+addCount = (value) => {
+  this.props.AddClick(value)
+  }
+  render() {
+    return (
+      <div>
+        <button onClick={e=>this.addCount(1)}>+1</button>
+        <button onClick={e=>this.addCount(5)}>+5</button>
+        <button onClick={e=>this.addCount(10)}>+10</button>
+      </div>
+    )
+  }
+}
+
+export default Header
+
+// Footer子组件
+import React, { Component } from 'react'
+export class Footer extends Component {
+  reduceCount=(count)=> {
+    this.props.reduceClick(count)
+  }
+  render() {
+    return (
+      <div>
+        <button onClick={e=>this.reduceCount(1)}>-1</button>
+        <button onClick={e=>this.reduceCount(5)}>-5</button>
+        <button onClick={e=>this.reduceCount(10)}>-10</button>
+      </div>
+    )
+  }
+}
+export default Footer
+```
+
+### 非父子的通信
+
+## setState 的使用
 
 ## 其他 
 ### 虚拟 DOM **（待补充）**
