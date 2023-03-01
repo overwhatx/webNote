@@ -825,7 +825,7 @@
 
 ### Constructor
 
-- 如果不初始化 state 或不进行方法绑定，则不需要为 React 组件实现构造函数
+- **如果不初始化 state 或不进行方法绑定，则不需要为 React 组件实现构造函数**
 - constructor中通常只做两件事情
   - 通过给 this.state 赋值对象来初始化内部的state
   - 为事件绑定实例（this）
@@ -856,14 +856,15 @@
 #### getDerivedStateFromProps
 - state 的值在任何时候都依赖于 props时使用；该方法返回一个对象来更新state
 #### getSnapshotBeforeUpdate
-- 在React更新DOM之前回调的一个函数，可以获取DOM更新前的一些信息（比如说滚动位置）；
+- 在React更新DOM之前回调的一个函数，可以获取DOM更新前的一些信息（比如说滚动位置）
 
 ## React 组件间的通信
+
+### 父传子
 - 父组件在展示子组件，可能会传递一些数据给子组件
   - 父组件通过 属性=值 的形式来传递给子组件数据
   - 子组件通过 props 参数获取父组件传递过来的数据
-### 父传子
-- 如果 constructor 中没有需要操作的事项 可以不写 在render函数中直接使用 this.pros 可以拿到父组件传递的值
+- **如果 constructor 中没有需要操作的事项 可以不写 在render函数中直接使用 this.pros 可以拿到父组件传递的值**
 ```js
 // 父组件
 import React, { Component } from 'react'
@@ -890,10 +891,9 @@ export class Main extends Component {
 export default Main
 // 子组件
 import React, { Component } from 'react'
-
 export class MainBanner extends Component {
   constructor(props) {
-    // console.log(props);
+    console.log(props);
     super(props)
   }
   render() {
@@ -915,7 +915,6 @@ export class MainBanner extends Component {
   }
 }
 export default MainBanner
-
 
 // 子组件
 import React, { Component } from 'react'
@@ -944,7 +943,7 @@ export default MainList
 - 对于传递给子组件的数据，有时候我们可能希望进行验证
 - 在没有使用Flow或者TypeScript 情况下 也可以通过 prop-types 库来进行类型验证
 - 从 React v15.5 开始，React.PropTypes 已移入另一个包中：prop-types 库
-  - 在使用前需要引入
+  - 在使用前需要引入 `import PropTypes from 'prop-types'`
 - 更多的验证方式，可以参考官网：https://zh-hans.reactjs.org/docs/typechecking-with-proptypes.html
 - 当类型校验不通过时会报警告
   - Warning: Failed prop type: Invalid prop `title` of type `number` supplied to `MainBanner`, expected `string`
@@ -1103,6 +1102,384 @@ export default Footer
 ```
 
 ### 非父子的通信
+- this.props 逐级传递 不过显得很臃肿并不是不能用
+
+#### Context
+
+- 只能咋类组件中这样使用，在函数组件中需要换个方式
+```js
+// theme-context.js
+import React from "react"
+// 第一步 创建一个 context
+const ThemeContext = React.createContext()
+export default ThemeContext
+
+
+// 2. App 父组件
+import React, { Component } from 'react'
+import Home from './Home'
+// 导入 ThemeContext
+import ThemeContext from './theme-context/theme-context.js'
+export class App extends Component {
+  constructor() {
+    super()
+    this.state = {
+      info: {name:'李四',age:19}
+    }
+  }
+  render() {
+    const { info}=this.state
+    return (
+      <div>
+        <h1>App</h1>
+        {/* 如果你已经有了一个 props 对象，你可以使用展开运算符 ... 来在 JSX 中传递整个 props 对象 */}
+        {/* 一下三个方式是等价的 */}
+        {/* <Home name='张三' age={ 18} /> */}
+        {/* <Home name={info.name} age={ info.age} /> */}
+        {/* <Home {...info} /> */}
+
+        {/* 第二步 通过创建的ThemeContext 中 Provider中value属性为后代提供数据 */}
+        {/* value 是固定写法不可以改 */}
+        <ThemeContext.Provider value={{name:'小八嘎',age:18,city:'台州'}}>
+        <Home {...info} />
+        </ThemeContext.Provider>
+      </div>
+    )
+  }
+}
+export default App
+
+// 3. 子组件
+import React, { Component } from 'react'
+import HomeInfo from './HomeInfo';
+export class Home extends Component {
+  render() {
+    console.log(this.props);
+    return (
+      <div>
+        <h1>Home</h1>
+        <HomeInfo/>
+      </div>
+    )
+  }
+}
+export default Home
+
+// 4.孙子组件
+import React, { Component } from 'react'
+import ThemeContext from './theme-context/theme-context.js'
+export class HomeInfo extends Component {
+  render() {
+    // 第四步 获取数据 并且使用数据
+    console.log(this.context);
+    return (
+      <div>HomeInfo</div>
+    )
+  }
+}
+// 第三步 设置组件的 contextType的类型 为某一个 Context
+HomeInfo.contextType=ThemeContext
+
+export default HomeInfo
+
+```
+- 使用多个 Context 使用 .Consumer方式
+  ```js
+  // 定义的 Context  （ThemeContext和UserContext 同理）
+  import React from "react" 
+  const UserContext = React.createContext()
+  export default UserContext
+
+  // 父组件
+  import React, { Component } from 'react'
+  import Home from './Home'
+  import ThemeContext from './theme-context/theme-context.js'
+  import UserContext from './theme-context/user-context'
+  export class App extends Component {
+    constructor() {
+      super()
+      this.state = {info: {name:'李四',age:19}}}
+    render() {
+      const { info}=this.state
+      return (
+        <div>
+          <h1>App</h1>
+          {/* 多个context 的写法 */}
+          <UserContext.Provider value={{hobby:'唱跳rap篮球'}}>
+            <ThemeContext.Provider value={{name:'小八嘎',age:18,city:'台州'}}>
+              <Home {...info} />
+            </ThemeContext.Provider>
+          </UserContext.Provider>
+        </div>
+      )
+    }
+  }
+  export default App
+
+  //孙子组件
+  import React, { Component } from 'react'
+  import ThemeContext from './theme-context/theme-context.js'
+  import UserContext from './theme-context/user-context.js';
+  export class HomeInfo extends Component {
+    render() {
+      // 第四步 获取数据 并且使用数据
+      console.log(this.context);
+      return (
+        <div>
+          <span>HomeInfo</span>
+          <UserContext.Consumer>
+            {
+              value => {
+                return <h2>info user hobby:{value.hobby }</h2>
+              }
+            }
+          </UserContext.Consumer>
+        </div>
+      )
+    }
+  }
+  // 第三步 设置组件的 contextType的类型 为某一个 Context
+  HomeInfo.contextType=ThemeContext
+  export default HomeInfo
+
+  ```
+- 在函数组件中的使用方式
+  ```js
+    import React, { Component } from 'react'
+    import UserContext from './theme-context/user-context.js';
+    export class HomeInfo extends Component {
+      render() {
+        return (
+          <div>
+            <span>HomeInfo</span>
+            // 
+            <UserContext.Consumer>
+              {
+                value => {
+                  return <h2>info user hobby:{value.hobby }</h2>
+                }
+              }
+            </UserContext.Consumer>
+          </div>
+        )
+      }
+    }
+    export default HomeInfo
+  ```
+
+##### Context 相关API
+- React.createContext `const MyContext=React.createContext(defaultValue)`
+  - 创建一个需要共享的Context对象
+  - 如果一个组件订阅了Context，那么这个组件会从离自身最近的那个匹配的 Provider 中读取到当前的context值
+  - defaultValue是组件在顶层查找过程中没有找到对应的Provider，那么就使用默认值
+
+- Context.Provider `<MyContext.Provider value={值}>`
+  - 每个 Context 对象都会返回一个 Provider React 组件，它允许消费组件订阅 context 的变化
+  - Provider 接收一个 value 属性，传递给消费组件
+  - 一个 Provider 可以和多个消费组件有对应关系
+  - 多个 Provider 也可以嵌套使用，里层的会覆盖外层的数据
+  - 当 Provider 的 value 值发生变化时，它内部的所有消费组件都会重新渲染
+- Class.contextType `MyClass.contextType=MyContext`
+  - 挂载在 class 上的 contextType 属性会被重赋值为一个由 React.createContext() 创建的 Context 对象
+  - 这能让你使用 this.context 来消费最近 Context 上的那个值
+  - 你可以在任何生命周期中访问到它，包括 render 函数中
+- Context.Consumer `<MyContext.Consumer>{value=>{return xxx}}</MyContext.Consumer>`
+  - 这里，React 组件也可以订阅到 context 变更。这能让你在 函数式组件 中完成订阅 context
+  - 这里需要 函数作为子元素（function as child）这种做法
+  - 这个函数接收当前的 context 值，返回一个 React 节点
+
+#### 事件总线 (eventBus) 待续
+
+## React 插槽
+
+### 实现方式1 通过 组件的children子元素 this.props.children 可以获取到 写在组件中的元素
+- **当写入了多个 元素时候 children 为数组形式，当只写入了一个元素时 children 就是元素本身**
+- 场景：例如移动端的头部
+- 弊端：通过索引值获取传入的元素很容易出错，不能精准的获取传入的元素 
+```js
+// 父组件
+import React, { Component } from 'react'
+import NavBar from './nav-bar'
+
+export class App extends Component {
+  render() {
+    return (
+      <div>
+        <NavBar>
+          <button>按钮</button>
+          <h1>标题</h1>
+          <i>图标</i>
+        </NavBar>
+      </div>
+    )
+  }
+}
+export default App
+
+// 子组件
+import React, { Component } from 'react'
+import './style.css'
+import PropTypes from 'prop-types'
+
+export class NavBar extends Component {
+  render() {
+    const { children } = this.props
+    // 当写入了多个 元素时候 children 为数组形式
+    // 当只写入了一个元素时 children 就是元素本身
+    return (
+      <div className='nav-bar'>
+        <div className="left">{ children[0]}</div>
+        <div className="middle">{ children[1]}</div>
+        <div className="right">{ children[2]}</div>
+
+       {/*  <div className="left">{ children}</div>
+        <div className="middle">{ children}</div>
+        <div className="right">{ children}</div> */}
+      </div>
+    )
+  }
+}
+// 可以限制 需要传递 array 还是 element （element是一个元素）
+NavBar.propTypes = {
+  children:PropTypes.array
+}
+export default NavBar
+```
+
+### 实现方式2 通过 props属性传递React元素
+- 通过具体的属性名，可以让我们在传入和获取时更加的精准
+```js
+// 父组件
+import React, { Component } from 'react'
+import NavBar from './nav-bar'
+import NavBar2 from './nav-bar2'
+
+export class App extends Component {
+  render() {
+    const title=<h1>标题</h1>
+    return (
+      <div>
+        {/* 1.使用 children 实现插槽 */}
+        <NavBar>
+          <button>按钮</button>
+          <h1>标题</h1>
+          <i>图标</i>
+        </NavBar>
+        {/* 2.使用props实现插槽 */}
+        <NavBar2
+          leftSlot={<button>一个按钮</button>}
+          middleSlot={ title}
+          rightSlot={ '一个图标'}
+        />
+      </div>
+    )
+  }
+}
+export default App
+
+// 子组件
+import React, { Component } from 'react'
+import './style.css'
+export class NavBar2 extends Component {
+  render() {
+    const { leftSlot,middleSlot,rightSlot}=this.props
+    return (
+      <div className='nav-bar'>
+        <div className="left">{ leftSlot}</div>
+        <div className="middle">{ middleSlot}</div>
+        <div className="right">{ rightSlot}</div>
+      </div>
+    )
+  }
+}
+export default NavBar2
+```
+
+### React 中作用域插槽的实现
+```js
+// 父组件
+import React, { Component } from 'react'
+import TabControl from './TabControl'
+
+export class App extends Component {
+  constructor() {
+    super()
+    this.state = {
+      titles: ['流行', '新款', '精选'],
+      tabIndex:0
+    }
+  }
+  tabClick(tabIndex) {
+    this.setState({tabIndex})
+  }
+  // 回调拿到的返回的参数 进行返回指定的 元素
+  getItem(item) {
+    if (item === '流行') {
+      return <span className='text'>{ item}</span>
+    } else if (item === '新款') {
+      return <button className='text'>{ item}</button>
+    } else {
+      return <i className='text'>{ item}</i>
+    }
+  }
+  render() {
+    const { titles,tabIndex}=this.state
+    return (
+      <div>
+        <TabControl
+          titles={titles}
+          tabClick={i => this.tabClick(i)}
+          // itemType={<button>嘿嘿</button>}
+          // itemType={item => <button>{ item}</button>}
+          // 根据不同的返回值 传入不同的元素
+          itemType={item => this.getItem(item)}
+          
+        />
+        <h1>{ titles[tabIndex]}</h1>
+      </div>
+    )
+  }
+}
+export default App
+
+// 子组件
+import React, { Component } from 'react'
+import './style.css'
+export class TabControl extends Component {
+  constructor() {
+    super()
+    this.state = {
+      currentIndex:0
+    }
+  }
+  itemClick(index) {
+    this.setState({
+      currentIndex:index
+    })
+    this.props.tabClick(index)
+    console.log( this.props.tabClick);
+  }
+  render() {
+    const { titles,itemType}=this.props
+    const { currentIndex}=this.state
+    return (
+      <div className='tab-control'>
+          {  titles.map((item,index) =>{
+            return <div key={item}
+              className={`item ${index === currentIndex ? 'active' : ''}`}
+              onClick={ e=>this.itemClick(index)}>
+              {/* <span className='text'>{ item}</span> */}
+              {/* 将item 回传给 父组件 */}
+              {itemType(item)}
+
+            </div>
+        })}
+      </div>
+    )
+  }
+}
+export default TabControl
+```
 
 ## setState 的使用
 
