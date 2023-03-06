@@ -858,7 +858,7 @@
 #### getSnapshotBeforeUpdate
 - 在React更新DOM之前回调的一个函数，可以获取DOM更新前的一些信息（比如说滚动位置）
 
-## React 组件间的通信
+## **React 组件间的通信**
 
 ### 父传子
 - 父组件在展示子组件，可能会传递一些数据给子组件
@@ -1482,6 +1482,764 @@ export default TabControl
 ```
 
 ## setState 的使用
+- 开发中我们并不能直接通过修改 state 的值来让界面发生更新
+  - 因为我们修改了 state 之后，希望React根据最新的 state 来重新渲染界面，但是这种方式的修改React并不知道数据发生了变化
+  - React并没有实现类似于Vue2中的 Object.defineProperty 或者Vue3中的 Proxy 的方式来监听数据的变化
+  - 我们必须通过setState来告知React数据已经发生了变化
+- **疑惑：在组件中并没有实现setState的方法，为什么可以调用呢？**
+  - setState方法是从Component中继承过来的
+
+### setState 三种使用方式
+- 基本使用方式
+- 传入回调函数
+  - 1.可以在回调函数中编写新的state的逻辑
+  - 2.当前的回调函数会将之前的state和props传递进来
+  - 3.可以在回调里面编写一些对新的state处理逻辑 也可以获取之前的state和props值
+- 第二个参数 回调函数
+  - 首先 setState 在react的事件处理是一个异步调用 （修改后并不会立马拿到已经改变的值）
+  - 场景 如果希望在数据更新后，立马获取到对应的结果执行一些逻辑代码 
+  - `this.setState({ message: "法外狂徒张三" }, () => {console.log(this.state.message);});` 这样修改后就能立马获取到最新值
+```js
+import React, { Component } from "react";
+
+export class App extends Component {
+  constructor() {
+    super();
+    this.state = {
+      message: "qnmd",
+      counter: 0,
+    };
+  }
+  changeText() {
+    // 1.setState 的基本使用
+    // this.setState({message:'wan'})
+
+    // 2.setState 传入回调函数
+    //  该方法优点：1.可以在回调函数中编写新的state的逻辑
+    //            2.当前的回调函数会将之前的state和props传递进来
+    /* this.setState((state, props) => {
+      // 可以在此处编写一些对新的state处理逻辑 也可以获取之前的state和props值
+      console.log(this.state.message, this.props);
+      return {
+        message: "hello",
+      };
+    }); */
+    // 3.setState 在react的事件处理是一个异步调用
+    // 如果希望在数据更新后，获取到对应的结果执行一些逻辑代码 可以在setState中传入第二个参数 callback 回调 （了解即可）
+    // this.setState({ message: "法外狂徒张三" });
+    // console.log("----------", this.state.message); //qnmd
+    this.setState({ message: "法外狂徒张三" }, () => {
+      console.log(this.state.message);
+    });
+  }
+  changeCounter() {
+    this.setState({ counter: this.state.counter++ });
+    console.log(this.state.counter);
+  }
+  render() {
+    const { message, counter } = this.state;
+    return (
+      <div>
+        <h1>App</h1>
+        <h2>{message}</h2>
+        <button onClick={(e) => this.changeText()}>修改文本</button>
+        <hr />
+        <h2>{counter}</h2>
+        <button onClick={(e) => this.changeCounter()}>++</button>
+      </div>
+    );
+  }
+}
+export default App;
+```
+
+### **setState异步更新 为什么setState设计为异步呢？**
+- 我们并不能在执行完setState之后立马拿到最新的state的结果 所以setState 更新是异步的
+```js
+this.setState({ message: "法外狂徒张三" });
+console.log(this.state.message); //返回的值还是没有改变前的值
+```
+- 为什么setState设计为异步呢？ 
+  - **setState设计为异步，可以显著的提升性能**
+  - **如果每次调用 setState都进行一次更新，那么意味着render函数会被频繁调用，界面重新渲染，这样效率是很低的；**
+  - 最好的办法应该是获取到多个更新，之后进行批量更新；
+- 如果变为同步
+  - 如果同步更新了state，但是还没有执行render函数，那么state和props不能保持同步；
+  - state和props不能保持一致性，会在开发中产生很多的问题；
+
+
+
+### 如何获取异步结果
+- 方式1：setState接受两个参数：第二个参数是一个回调函数，这个回调函数会在更新后会执行
+- 方式2：在生命周期函数 componentDidUpdate(){} 中获取改变后的值
+
+### setState 一定是异步吗？
+- React18 之前 分情况
+  - 在组件生命周期或React合成事件中，setState是异步
+  - 在setTimeout或者原生dom事件中，setState是同步
+  ```js
+    // 在setTimeout 中
+     syncTest() {
+    // 异步
+    /* this.setState({ message: "法外狂徒张三" });
+    console.log(this.state.message); //返回的还是之前的值*/
+    // 在react 18之前 setTimeout中setState操作 是同步操作
+    // 在react 18之后 setTimeout中setState操作 是异步操作
+    setTimeout(() => {
+      this.setState({ message: "法外狂徒张三" });
+      console.log(this.state.message); //法外狂徒张三
+    }, 0);
+  }
+
+  //在原生dom 事件中
+  componentDidMount(){
+    const btnEl=document.getElementById('btn')
+    btnEl.addEventListener('click',()=>{this.setState({message:'改变后的值'})})
+    console.log(this.state.message)//改变后的值
+  }
+  ```
+- React18 之后 setState 默认是异步的
+  - 希望变为同步的，则需要执行特殊的 flushSync 操作
+    ```js
+    yncTest() {
+      // 在react 18之后 执意要变为同步的
+      setTimeout(() => {
+        flushSync(() => {
+          this.setState({ message: "法外狂徒张三" });
+        });
+        console.log(this.state.message);
+      }, 0);
+    }
+    ```
+
+## React性能优化SCU （shouldComponentUpdate） **从这里开始使用 rpc生成 不在使用rec**
+- React更新机制: jsx --> 虚拟DOM --> 真实DOM
+- React的更新流程：props/state 改变 --> render函数重新执行 --> 产生DOM树 --> 新旧DOM树进行diff -->计算出差异进行更新 --> 更新到真实的DOM
+- props或者state中的数据是否发生了改变，来决定shouldComponentUpdate返回true或者false
+- React在props或state发生改变时，会调用React的render方法，会创建一颗不同的树
+- React对这个算法进行了优化，将其优化成了O(n)
+  - 同层节点之间相互比较，不会垮节点比较；
+  - 不同类型的节点，产生不同的树结构；
+  - 开发中，可以通过key来指定哪些节点在不同的渲染下保持稳定
+### PureComponent 和 memo 的性能优化
+
+#### PureComponent （针对类组件）
+- class继承自 PureComponent
+```js
+// 父组件
+import React, { PureComponent } from "react";
+import Home from "./Home";
+export class App extends PureComponent {
+  constructor() {
+    super();
+    this.state = {message: "HelloWorld",};
+    }
+
+  // 手动做性能优化 较为繁琐 需要逐个去判断是否更新了源数据
+  /* shouldComponentUpdate(nextProps, newState) {
+    if (this.state.message !== newState) {return true;}
+    return false;} */
+
+  changeText() {
+    this.setState({ message: "abc" });
+    // this.setState({ message: "HelloWorld" });
+  }
+
+  render() {
+    console.log("App render");
+    const { message, counter } = this.state;
+    // 使用 Component时 App的render() 执行后 子组件都会重新执行
+    return (
+      <div>
+        <h1>App</h1>
+        <div>
+          {message} -- {counter}
+        </div>
+        <button onClick={(e) => this.changeText()}>修改文本</button>
+        <hr />
+        <Home message={message}></Home>
+        <hr />
+      </div>
+    );
+  }
+}
+export default App;
+
+// 子组件
+import React, { PureComponent } from 'react'
+export class Home extends PureComponent {
+ /*  shouldComponentUpdate() {return false} */
+  render() {
+    console.log('Home render');
+    return (
+      <div>
+        <h2>Home</h2>
+        <div>{ this.props.message}</div>
+      </div>
+    )
+  }
+}
+export default Home
+```
+#### memo （针对函数式组件）
+- 函数式组件不使用memo 时 父组件但凡 render()函数重新执行了，子组件的render也会重新执行一次 （无论子组件中数据是否有改变更新）
+- 使用memo后 只有当 子组件中的数据有所变化时，render()函数才能重新执行
+```js
+// 父组件
+import React, { PureComponent } from "react";
+import Fn from "./Fn";
+export class App extends PureComponent {
+  constructor() {
+    super();
+    this.state = {message: "HelloWorld",};
+  }
+  changeText() {this.setState({ message: "abc" });}
+  render() {
+    console.log("App render");
+    const { message, counter } = this.state;
+    return (
+      <div>
+        <h1>App</h1>
+        <div>{message} -- {counter}</div>
+        <hr />
+        {/* <Fn  message={message}></Fn> */}
+        <Fn></Fn>
+      </div>
+    );
+  }
+}
+export default App;
+
+// 函数式 子组件
+import { memo } from "react";
+
+// 不使用memo 时 父组件但凡 render()重新执行子组件的render也会重新执行一次
+/* function Profile(props) {
+  console.log("Profile render");
+  return <h2>Profile:{props.message}</h2>;
+} */
+
+// 使用 memo
+const Profile = memo(function Profile(props) {
+  console.log("Profile render");
+  return <h2>Profile:{props.message}</h2>;
+});
+export default Profile;
+```
+
+## state 中的数据
+- 不要直接去改变 state中的数据
+```js
+import React, { PureComponent } from "react";
+export class App extends PureComponent {
+  constructor() {
+    super();
+   this.state = {
+      books: [
+        {name: "javascript 权威指南",price: 99,count: 1,},
+        {name: "React 权威指南",price: 100,count: 2,},
+        {name: "Vue 权威指南",price: 80,count: 3,},
+        {name: "Typescript 权威指南",price: 90,count: 4,},
+      ],
+    };
+  }
+  addBooks() {
+    console.log(1);
+    // 使用 Component 时可以成功添加数据 并且成功重新渲染
+    // 但使用 PureComponent 时可以成功添加数据 但不会重新渲染
+    const newBooks = { name: "CSS 权威指南", price: 50, count: 1 };
+    // Component
+    /* this.state.books.push(newBooks);
+    this.setState({ books: this.state.books }); */
+
+    // PureComponent
+    // 浅拷贝一次
+    const books = [...this.state.books];
+    books.push(newBooks);
+    this.setState({ books });
+    console.log(this.state.books);
+  }
+  Addcount(index) {
+    const books = [...this.state.books];
+    books[index].count++;
+    this.setState({ books });
+  }
+  render() {
+    const { books } = this.state;
+    return (
+      <div>
+        <h2>数据列表</h2>
+        <ul>
+          {books.map((item, index) => {
+            return (
+              <li key={index}>
+                <span>
+                  书名：{item.name} 价格：{item.price} 数量：{item.count}
+                </span>
+                <button onClick={(e) => this.Addcount(index)}>+1</button>
+              </li>
+            );
+          })}
+        </ul>
+        <button onClick={(e) => this.addBooks()}>添加新书籍</button>
+      </div>
+    );
+  }
+}
+export default App;
+```
+
+## 获取DOM方式ref
+- 在React的开发模式中，通常情况下不需要、也不建议直接操作DOM原生，但是某些特殊的情况，确实需要获取到DOM进行某些操作
+  - 管理焦点，文本选择或媒体播放；
+  - 触发强制动画；
+  - 集成第三方 DOM 库；
+### 三种获取方式
+- **不能在函数组件上使用 ref 属性，因为他们没有实例 （但有其他方式）**
+- 原生方式去获取原生DOM是可以的但是不推荐这样使用
+- 方式1 传入字符串
+  - 使用时通过 this.refs.传入的字符串格式获取对应的元素； **refs 过期了**
+- 方式2 传入一个对象
+  - 对象是通过 React.createRef() 方式创建出来的；
+  - 使用时获取到创建的对象其中有一个current属性就是对应的元素；
+- 方式3.传入一个函数
+  - 该函数会在DOM被挂载时进行回调，这个函数会传入一个 元素对象，我们可以自己保存；
+  - 使用时，直接拿到之前保存的元素对象即可；
+```js
+import React, { PureComponent, createRef } from "react";
+export default class App extends PureComponent {
+  constructor() {
+    super();
+
+    // 方式2.引入createRef 提前创建好ref对象，createRef()将创建出来的对象绑定到元素
+    this.titleRef = createRef();
+    // 方式3
+    this.titleEl = null;
+  }
+  getNativeDOM() {
+    // 不建议使用这种方式获取DOM元素
+    /*   const h2El = document.querySelector("h2");
+    console.log(h2El); */
+    // 方式1.在react元素上绑定一个ref字符串
+    // console.log(this.refs.xxx);
+    // 方式2.推荐使用方式2官方用法
+    // console.log(this.titleRef.current);
+    // 方式3.传入一个回调函数，在对应的元素被渲染之后，回调函数被执行，并且将元素传入
+    console.log(this.titleEl);
+  }
+  render() {
+    return (
+      <div>
+        <h1>App</h1>
+        <h2 ref="xxx">Hello world</h2>
+        <h2 ref={this.titleRef}>Hello 张三</h2>
+        <h2 ref={el => this.titleEl = el}>Hello 李四</h2>
+        <button onClick={(e) => this.getNativeDOM()}>获取DOM</button>
+      </div>
+    );
+  }
+}
+```
+
+## 获取组件实例
+
+### 获取类组件中的DOM
+- 使用 createRef
+```js
+import React, { PureComponent, createRef } from "react";
+// 子组件
+class HelloWorld extends PureComponent {
+  FnTest() {
+    console.log("子组件的函数");
+  }
+  render() {
+    return (
+      <div>
+        <h2>HelloWorld</h2>
+      </div>
+    );
+  }
+}
+
+// 父组件
+export default class App extends PureComponent {
+  constructor() {
+    super();
+    this.hwRef = createRef();
+  }
+  getComponent() {
+    console.log(this.hwRef.current)
+    // 拿到子组件后可以调用子组件中的方法
+    this.hwRef.current.FnTest();
+  }
+  render() {
+    return (
+      <div>
+        <h1>App</h1>
+        <button onClick={(e) => this.getComponent()}>获取组件实例</button>
+        {/* 组件 */}
+        <HelloWorld ref={this.hwRef}></HelloWorld>
+      </div>
+    );
+  }
+}
+```
+
+### 获取函数组件中的DOM （ref的转发）
+- 函数式组件是没有实例的，所以无法通过ref获取他们的实例
+- 使用 forwardRef 同时需要在 要获取的元素上设置 ref
+```js
+import React, { PureComponent, createRef, forwardRef } from "react";
+const HelloWorld = forwardRef(function (props, ref) {
+  return (
+    <div>
+      <h2 ref={ref}>HelloWorld</h2>
+    </div>
+  );
+});
+export default class App extends PureComponent {
+  constructor() {
+    super();
+    this.hwRef = createRef();
+  }
+  getComponent() {
+    console.log(this.hwRef.current);
+  }
+  render() {
+    return (
+      <div>
+        <h1>App</h1>
+        <button onClick={(e) => this.getComponent()}>获取组件实例</button>
+        {/* 组件 */}
+        <HelloWorld ref={this.hwRef}></HelloWorld>
+      </div>
+    );
+  }
+}
+
+```
+
+## 受控组件 和 非受控组件
+
+#### 非受控组件
+- 在React中， HTML表单的处理方式和普通的DOM元素不太一样：表单元素通常会保存在一些内部的state
+- **不推荐使用非受控组件**
+```js
+import React, { PureComponent } from "react";
+export default class App extends PureComponent {
+  constructor() {
+    super();
+    this.state = {username: "",};
+  }
+  inputChange(e) {
+    console.log(e.target.value);
+    this.setState({username: e.target.value,});
+  }
+  render() {
+    const { username } = this.state;
+    return (
+      <div>
+        <h1>App</h1>
+        <input type="text" onChange={(e) => this.inputChange(e)} />
+        <h2>username: {username}</h2>
+      </div>
+    );
+  }
+}
+```
+- 在非受控组件中通常使用defaultValue来设置默认值
+- `<input type="checkbox"> 和 <input type="radio">` 支持 defaultChecked
+- `<select> 和 <textarea>` 支持 defaultValue。
+- 案例
+  ```js
+  import React, { createRef, PureComponent } from "react";
+  export default class App extends PureComponent {
+    constructor() {
+      super();
+      this.state = {message: "大小姐尿尿统统闪开",};
+      this.messageRef = createRef();
+    }
+    handleSubmit(event) {
+      // 阻止默认事件
+      event.preventDefault();
+      console.log(this.messageRef.current.value);
+    }
+
+    render() {
+      const { message } = this.state;
+      return (
+        <div>
+          <h1>App</h1>
+          <form onSubmit={(e) => this.handleSubmit(e)}>
+            {/* 非受控 */}
+            <div>
+              <input type="text" defaultValue={message} ref={this.messageRef} />
+            </div>
+            <div>
+              <button type="submit">注册</button>
+            </div>
+          </form>
+        </div>
+      );
+    }
+  }
+
+  ```
+
+### 受控组件
+- 由于在表单元素上设置了 value 属性，因此显示的值将始终为 this.state.value，这使得 React 的 state 成为唯一数据源
+- 当绑定了value属性时 该组件就是react的受控组件，只能通过绑定onChange事件去修改值
+  ```js
+  import React, { PureComponent } from "react";
+  export default class App extends PureComponent {
+    constructor() {
+      super();
+      this.state = {username: "张三",};
+      }
+    inputChange(e) {
+      console.log(e.target.value);
+      this.setState({username: e.target.value});
+    }
+    render() {
+      const { username } = this.state;
+      return (
+        <div>
+          <h1>App</h1>
+          <input
+            type="text"
+            onChange={(e) => this.inputChange(e)}
+            value={username}
+          />
+          <h2>username: {username}</h2>
+        </div>
+      );
+    }
+  }
+  ```
+
+- 多个表单共用同一个处理函数 **案例**
+  ```js
+    import React, { PureComponent } from "react";
+    export default class App extends PureComponent {
+      constructor() {
+        super();
+        this.state = {username: "",password: "",};
+      }
+      /* inputChangeUsn(e) {
+        // console.log(e.target.value);
+        this.setState({
+          username: e.target.value,
+        });
+      }
+      inputChangePwd(e) {
+        // console.log(e.target.value);
+        this.setState({
+          password: e.target.value,
+        });
+      } */
+      // 将多个表单 放到同一个事件中进行处理
+      handelInputChange(event) {
+        // 获取input 绑定的name属性
+        // const keyName = event.target.name;
+        this.setState({
+          // [keyName]: event.target.value,
+          [event.target.name]: event.target.value,
+        });
+      }
+      handleSubmit(event) {
+        // 阻止默认事件
+        event.preventDefault();
+        console.log(event);
+        // 拿到值 将数据传递给服务器
+        console.log(event.target.username.value, event.target.password.value);
+      }
+      render() {
+        const { username, password } = this.state;
+        return (
+          <div>
+            <h1>App</h1>
+            <form onSubmit={(e) => this.handleSubmit(e)}>
+               <label htmlFor="username">
+                用户：
+                <input id="username" type="text" name="username" value={username} onChange={(e) => this.handelInputChange(e)} />
+              </label>
+              <label htmlFor="password">
+                密码：
+                <input id="password" type="text" name="password" value={password} onChange={(e) => this.handelInputChange(e)} />
+              </label>
+              <button type="submit">注册</button>
+            </form>
+            <h2>username: {username}</h2>
+            <h2>password: {password}</h2>
+          </div>
+        );
+      }
+    }
+  ```
+
+- 实现单选多选 **案例**
+  - 获取选框是否被选中 event.target.checked
+  ```js
+  import React, { PureComponent } from "react";
+  export default class App extends PureComponent {
+    constructor() {
+      super();
+      this.state = {
+        username: "",
+        password: "",
+        isAgree: true,
+        hobbies: [
+          { value: "sing", text: "唱", isChecked: false },
+          { value: "jump", text: "跳", isChecked: false },
+          { value: "rap", text: "rap", isChecked: false },
+          { value: "basketball", text: "篮球", isChecked: false },
+        ],
+      };
+    }
+
+    //单选
+    handelAgree(e) {
+      console.log(e.target.checked);
+      this.setState({
+        isAgree: e.target.checked,
+      });
+    }
+    //多选
+    handerHobby(e, index) {
+      const hobbies = [...this.state.hobbies];
+      hobbies[index].isChecked = e.target.checked;
+      this.setState({ hobbies });
+    }
+
+    handleSubmit(event) {
+      // 阻止默认事件
+      event.preventDefault();
+      console.log(event);
+      // 获取单选 拿到值 将数据传递给服务器
+      console.log(event.target.username.value, event.target.password.value);
+      // 获取多选
+      // 获取选框被选中的
+      const hobbies = this.state.hobbies.filter((item) => item.isChecked);
+      // 将被选中进行下一步处理
+      const hobbiesValue = hobbies.map((item) => item.value);
+      console.log(hobbies);
+      console.log(hobbiesValue);
+    }
+    render() {
+      const { username, password, isAgree, hobbies } = this.state;
+      return (
+        <div>
+          <h1>App</h1>
+          <form onSubmit={(e) => this.handleSubmit(e)}>
+            {/* 单选 */}
+            <label htmlFor="agree">
+              <input type="checkbox" id="agree" checked={isAgree} onChange={(e) => this.handelAgree(e)} />
+              同意协议
+            </label>
+
+            {/* 多选 */}
+            <div>
+              hobby：
+              {hobbies.map((item, index) => {
+                return (
+                  <label htmlFor={item.value} key={index}>
+                    <input type="checkbox" id={item.value} checked={item.isChecked} onChange={(e) => this.handerHobby(e, index)} />
+                    {item.text}
+                  </label>
+                );
+              })}
+            </div>
+            <div>
+              <button type="submit">注册</button>
+            </div>
+          </form>
+        </div>
+      );
+    }
+  }
+
+  ```
+
+- 实现下拉框的多选
+  ```js
+  import React, { PureComponent } from "react";
+  export default class App extends PureComponent {
+    constructor() {
+      super();
+      this.state = {
+        fruit: [],
+      };
+    }
+    handelSelect(event) {
+      // console.log(event);
+      // console.log(event.target.value);
+      // Array.from() 将一个类数组转换为 真数组
+
+      // const options = Array.from(event.target.selectedOptions);
+      // const fruit = options.map((item) => item.value);
+      // 上同下
+      const fruit = Array.from(event.target.selectedOptions,(item) => item.value);
+      console.log(fruit);
+      this.setState({ fruit });
+    }
+
+    handleSubmit(event) {
+      // 阻止默认事件
+      event.preventDefault();
+      console.log(event);
+      console.log(this.state.fruit);
+    }
+    render() {
+      const { fruit } = this.state;
+      return (
+        <div>
+          <h1>App</h1>
+          <form onSubmit={(e) => this.handleSubmit(e)}>
+            {/* 下拉框 */}
+            <div>
+              {/* multiple 多选 */}
+              <select
+                id=""
+                value={fruit}
+                onChange={(e) => this.handelSelect(e)}
+                multiple
+              >
+                <option value="apple">苹果</option>
+                <option value="origin">橘子</option>
+                <option value="banner">香蕉</option>
+              </select>
+            </div>
+            <div>
+              <button type="submit">注册</button>
+            </div>
+          </form>
+        </div>
+      );
+    }
+  }
+  ```
+
+## React的高阶组件
+- 高阶函数的定义
+  - 接受一个或多个函数作为输入
+  - 输出一个函数
+  - JavaScript中比较常见的filter、 map、 reduce都是高阶函数
+- 高阶组件的定义
+  - 高阶组件的英文是 Higher-Order Components，简称为 HOC；
+  - 官方的定义： 高阶组件是参数为组件，返回值为新组件的函数；
+  - 首先， 高阶组件 本身不是一个组件，而是一个函数；
+  - 其次， 这个函数的参数是一个组件，返回值也是一个组件；
+  - 高阶组件并不是React API的一部分，它是基于React的组合特性而形成的设计模式；
+  - 高阶组件在一些React第三方库中非常常见
+- 组件的名称问题
+  - 在ES6中，类表达式中类名是可以省略的；
+  - 组件的名称都可以通过displayName来修改；
+### props的增强
+
+## portals和fragment
+
+
+## StrictMode严格模式
 
 ## 其他 
 ### 虚拟 DOM **（待补充）**
