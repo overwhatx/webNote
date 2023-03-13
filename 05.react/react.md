@@ -2219,7 +2219,7 @@ export default class App extends PureComponent {
   }
   ```
 
-## React的高阶组件
+## React的高阶组件 
 - 高阶函数的定义
   - 接受一个或多个函数作为输入
   - 输出一个函数
@@ -2234,10 +2234,74 @@ export default class App extends PureComponent {
 - 组件的名称问题
   - 在ES6中，类表达式中类名是可以省略的；
   - 组件的名称都可以通过displayName来修改；
+- 高阶组件的优点
+  - 利用高阶组件可以针对某些React代码进行更加优雅的处理
+- 高阶组件的缺点
+  - HOC需要在原组件上进行包裹或者嵌套， 如果大量使用HOC，将会产生非常多的嵌套，这让调试变得非常困难
+  - HOC可以劫持props，在不遵守约定的情况下也可能造成冲突
+
 ### props的增强
 
-## portals和fragment
+### 高阶组件应用案例 登录鉴权
+- 场景描述：在用户没有登录前 很多页面是不进行展示的，逐个去判断略显繁琐，编写高阶组件，在需要进行判断的页面进行调用该组件，控制当前页面是否展示
+```jsx
+// App.jsx 
+import React, { PureComponent } from "react";
+import Cart from "./page/Cart";
+export default class App extends PureComponent {
+  constructor() {
+    super();
+    this.state = {
+      isLogin: false,
+    };
+  }
+  loginClick() {
+    localStorage.setItem("token", "登录的模拟tokenValue");
+    // this.setState({ isLogin: true });
+    // 强制进行更新 重新渲染render
+    this.forceUpdate();
+  }
+  render() {
+    const { isLogin } = this.state;
+    return (
+      <div>
+        <h1>App</h1>
+        <button onClick={(e) => this.loginClick()}>登录</button>
+        <Cart />
+      </div>
+    );
+  }
+}
 
+// Cart.jsx 子组件
+import React, { PureComponent } from "react";
+import loginAuth from "../hoc/login_auth";
+export class Cart extends PureComponent {
+  render() {
+    return <h2>Cart 判定登录后的显示</h2>;
+  }
+}
+// 在导出之前进行判断 是否是登录状态
+// 登录鉴权
+export default loginAuth(Cart);
+
+// login_auth.js
+// 定义的高阶组件
+function loginAuth(Assembly) {
+  return props => {
+    // 模拟登录成功后 从localStorage 中获取token
+    const token = localStorage.getItem('token')
+    if (token) {
+      return <Assembly {...props} />
+    } else {
+      return <h2>请先登录，在进行跳转到对应的页面中</h2>
+    }
+  }
+}
+export default loginAuth
+```
+
+## portals和fragment
 
 ## StrictMode严格模式
 
