@@ -2545,6 +2545,64 @@ export const AppWrapper = styled.div`
   `
   ```
 
+## React中添加class
+- React在JSX给了我们开发者足够多的灵活性，你可以像编写JavaScript代码一样，通过一些逻辑来决定是否添加某些class
+- 方式1：通过原生方式
+```js
+import React, { PureComponent } from "react";
+export class App extends PureComponent {
+  constructor() {
+    super();
+    this.state = {
+      isActive: true,
+    };
+  }
+  render() {
+    const { isActive } = this.state;
+    return (
+      <div>
+        <div className={`list ${isActive ? "active" : ""}`}>方式1</div>
+        <div className={"list " + (isActive ? "active" : "")}>方式1</div>
+        <div className={["list", isActive ? "active" : ""].join(" ")}>
+          方式2
+        </div>
+      </div>
+    );
+  }
+}
+export default App;
+```
+- 方式2：通过 classnames 库
+```js
+import React, { PureComponent } from "react";
+import classNames from "classnames"; //导入 className
+export class App extends PureComponent {
+  constructor() {
+    super();
+    this.state = {
+      isActive: true,
+    };
+  }
+  render() {
+    const { isActive } = this.state;
+    return (
+      <div>
+        {/* 使用 */}
+        <div className={classNames("list", { active: isActive, bbb: isActive })}>
+          一个元素
+        </div>
+        {/* 或者数组形式 */}
+         <div className={classNames(["list", { active: isActive, bbb: isActive }])}>
+          一个元素
+        </div>
+      </div>
+    );
+  }
+}
+
+export default App;
+
+```
 ## portals和fragment
 
 ## StrictMode严格模式
