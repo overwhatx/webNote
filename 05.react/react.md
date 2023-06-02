@@ -2219,7 +2219,7 @@ export default class App extends PureComponent {
   }
   ```
 
-## React的高阶组件 
+## React的高阶组件
 - 高阶函数的定义
   - 接受一个或多个函数作为输入
   - 输出一个函数
@@ -2300,6 +2300,250 @@ function loginAuth(Assembly) {
 }
 export default loginAuth
 ```
+
+## React中编写css
+- react 中引入的样式文件都会成为全局的，当两个不同组件中使用了同一个类名会导致冲突
+### 内联方式
+- 内联样式的优点：
+  1.内联样式，样式之间不会有冲突
+  2.可以动态获取当前state中的状态
+- 内联样式的缺点：
+  1.写法上都需要使用驼峰标示识
+  2.某些样式没有提示
+  3.大量的样式，代码混乱
+  4.某些样式无法编写（比如伪类/伪元素）
+```js
+import React, { PureComponent } from "react";
+export class App extends PureComponent {
+  constructor() {
+    super();
+    this.state = {
+      h1Size: 30,
+      h2Color: "#008c8c",
+    };
+  }
+  addH1Size() {
+    this.setState({
+      h1Size: this.state.h1Size + 2,
+    });
+  }
+  render() {
+    const { h1Size, h2Color } = this.state;
+    return (
+      <div>
+        <button onClick={(e) => this.addH1Size()}>增加H1Size</button>
+        <h1 style={{ color: "red", fontSize: `${h1Size}px` }}>App</h1>
+        <h2 style={{ color: h2Color }}>#008c8c</h2>
+      </div>
+    );
+  }
+}
+export default App;
+```
+
+### 普通方式
+- 普通的css我们通常会编写到一个单独的文件，之后再进行引入
+- 这样的编写方式和普通的网页开发中编写方式是一致的：
+  - 如果我们按照普通的网页标准去编写，那么也不会有太大的问题；
+  - 但是组件化开发中我们总是希望组件是一个独立的模块，即便是样式也只是在自己内部生效，不会相互影响；
+  - 但是普通的css都属于全局的css,样式之间会相互影响；
+- **这种编写方式最大的问题是样式之间会相互层叠掉；**
+```js
+// App.jsx
+import React, { PureComponent } from "react";
+import "./App.css"; // 引入css
+export class App extends PureComponent {
+  render() {
+    return (
+      <div>
+        <h1 className="title">标题</h1>
+        <h2 className="content">Lorem ipsum dolor sit amet.</h2>
+      </div>
+    );
+  }
+}
+export default App;
+
+// App.css
+.title{
+  color:#008c8c;
+  font-size: 30px;
+}
+.content{
+  color: lightpink;
+}
+```
+
+### css modules
+- css modules并不是React特有的解决方案，而是所有使用了类似于webpack配置的环境下都可以使用的：
+  - 如果在其他项目中使用它，那么我们需要自己来进行配置，比如配置webpack.config,js中的modules:true等
+- React的脚手架已经内置了css modules的配置：
+  - .css/.less/.scss等样式文件都需要修改成.module.css/.module.less/.module.scss等；
+  - 之后就河以引用并且进行使用了：
+- css modulesi确实解决了局部作用域的问题，也是很多人喜欢在Reactt中使用的一种方案。
+  - 但是这种方案也有自己的缺陷：
+  - **引用的类名，不能使用连接符(.home-title),在javaScript中是不识别的**
+  - 所有的className都必须使用{style.className}的形式来编写；
+  - 不方便动态来修改某些样式，依然需要使用内联样式的方式：
+```js
+// App.jsx
+import React, { PureComponent } from "react";
+import appStyle from "./App.module.css";
+export class App extends PureComponent {
+  render() {
+    return (
+      <div>
+        <h1 className={appStyle.title}>标题</h1>
+        <h2 className={appStyle.content}>Lorem ipsum dolor sit amet.</h2>
+      </div>
+    );
+  }
+}
+export default App;
+
+// App.module.css
+.title{
+  color:#008c8c;
+  font-size: 30px;
+}
+.content{
+  color: lightpink;
+}
+```
+
+### CSS-in-JS
+- 官方文档也有提到过CSS in JS这种方案："CSS-in-JS”是指一种模式，其中CSS由JavaScript生成而不是在外部文件中定义；
+  - 注意此功能并不是React的一部分，而是由第三方库提供；React对样式如何定义并没有明确态度；
+- 在传统的前端开发中，我们通常会将结构(HTML)、样式(CSS)、逻辑(JavaScript)进行分离。
+  - 但是在前面的学习中，我们就提到过，Ract的思想中认为逻辑本身和UI是无法分离的，所以才会有了JSX的语法。
+  - 样式呢？样式也是属于ui的一部分：
+  - 事实上CSS-in-JS的模式就是一种将样式(CSS)也写入到javaScriptr中的方式，并且可以方便的使用javaScript的状态；
+  - 所以React?有被人称之为All in JS;
+- 批评声音虽然有，但是在我们看来很多优秀的CSS-i-JS的库依然非常强大、方便：
+- CSS-in-JS通过JavaScript来为CSS赋予一些能力，包括类似于CSS预处理器一样的样式嵌套、函数定义、逻辑复用、动态修改状态等等；
+- 虽然CSS预处理器也具备某些能力，但是获取动态状态依然是一个不好处理的点；
+- 所以，目前可以说CSS-in-JS是React编写CSS最为受欢迎的一种解决方案，
+- 目前比较流行的CSS-in-JS的库
+  - styled-components
+  - emotion
+  - glamorous
+#### styled-components 的使用
+- 安装 `npm i styled-components`
+- 安装vscode插件 vscode-styled-components 用于在引入 styled-components的js文件中更好的使用css
+```js
+//App.jsx
+import React, { PureComponent } from "react";
+import { AppWrapper } from "./style";
+export class App extends PureComponent {
+  render() {
+    return (
+      <AppWrapper>
+        <div>
+          <h1 className="title">标题</h1>
+          <h4 className="content">内容：Lorem ipsum dolor sit amet.</h4>
+        </div>
+      </AppWrapper>
+    );
+  }
+}
+export default App;
+
+//style.js
+import styled from "styled-components";
+export const AppWrapper = styled.div`
+.title{
+  color:#008c8c;
+}
+.content{
+  color:lightpink;
+}
+`
+// styled.div`` 的含义===styled.div（） 调用该函数 如下案例
+<script>
+  const name = "张三";
+  const age = 18;
+  function foo(...args) {
+    console.log(args);  // ['my name is ', ',age is ', ''] "张三" 18
+  }
+  foo`my name is ${name},age is ${age}`;
+</script>
+```
+- 基础用法
+  ```js
+  //App.jsx
+  import React, { PureComponent } from "react";
+  import { AppWrapper, UlLists, Button1, Button2 } from "./style";
+  export class App extends PureComponent {
+    constructor() {
+      super();
+      this.state = {
+        size: "50px",
+        color: "red",
+      };
+    }
+    render() {
+      const { size, color } = this.state;
+      return (
+        <AppWrapper>
+          <div>
+            <h1 className="title">标题</h1>
+            <h4 className="content">内容：Lorem ipsum dolor sit amet.</h4>
+          </div>
+          {/* 传递动态样式参数 */}
+          <UlLists size={size} color={color}> 
+          <li> 1</li> <li> 2</li> <li> 3</li> <li> 4</li> <li> 5</li>
+          </UlLists>
+          <button onClick={(e) => this.setState({ color: "lightpink" })}>
+            修改组件样式
+          </button>
+          <div>
+            <Button1>button1</Button1>
+          </div>
+          <div>
+            <Button2>button2</Button2>
+          </div>
+        </AppWrapper>
+      );
+    }
+  }
+  export default App;
+
+  //style.js 样式
+  import styled from "styled-components";
+  export const AppWrapper = styled.div`
+  .title{
+    color:#008c8c;
+  }
+  .content{
+    color:lightpink;
+  }
+  `
+  // 单独抽离一个样式组件
+  // 接收外部传入的样式参数 例如：${props => props.color}px
+  // 在接收外部传入样式参数时，设置默认样式参数
+  export const UlLists = styled.div.attrs(props => ({
+    Tcolor: props => props.color || 'lightblue',
+    Tsize: props => props.size || '20px'
+  }))`
+  li{
+  list-style: none; 
+  color: ${props => props.Tcolor};
+  size: ${props => props.Tsize};
+  background-color: #999;
+  }
+  `
+
+  // 继承
+  export const Button1 = styled.button`
+  width: 200px;
+  height: 50px;
+  border: 1px solid #008c8c;
+  background-color: lightblue;
+  `
+  export const Button2 = styled(Button1)`
+  border-radius: 20px;
+  `
+  ```
 
 ## portals和fragment
 
