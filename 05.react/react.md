@@ -2603,18 +2603,75 @@ export class App extends PureComponent {
 export default App;
 
 ```
+
+
+## Redux
+- Redux就是一个帮助我们管理State的容器： Redux是JavaScript的状态容器，提供了可预测的状态管理；
+
+### Redux 核心理念
+
+- store
+  - 如果我们没有定义统一的规范来操作这段数据，那么整个数据的变化就是无法跟踪的；
+- action
+  - Redux要求我们通过action来更新数据
+  - 所有数据的变化，必须通过派发（dispatch） action来更新；
+  - action是一个普通的JavaScript对象，用来描述这次更新的type和content；
+  - 强制使用action的好处是可以清晰的知道数据到底发生了什么样的变化，所有的数据变化都是可跟追、可预测的；
+- reducer
+  - reducer是一个纯函数；
+  - reducer做的事情就是将传入的state和action结合起来生成一个新的state；
+
+### Redux 的三大原则
+
+- 单一数据源
+  - 整个应用程序的state被存储在一颗object tree中，并且这个object tree只存储在一个 store 中：
+  - Redux并没有强制让我们不能创建多个Store，但是那样做并不利于数据的维护；
+  - 单一的数据源可以让整个应用程序的state变得方便维护、追踪、修改；
+- State是只读的
+  - 唯一修改State的方法一定是触发action， 不要试图在其他地方通过任何的方式来修改State：
+  - 这样就确保了View或网络请求都不能直接修改state，它们只能通过action来描述自己想要如何修改state；
+  - 这样可以保证所有的修改都被集中化处理，并且按照严格的顺序来执行，所以不需要担心 race condition（竟态）的问题；
+- 使用纯函数来执行修改
+  - 通过reducer将 旧state和 actions联系在一起，并且返回一个新的State：
+  - 随着应用程序的复杂度增加，我们可以将reducer拆分成多个小的reducers， 分别操作不同state tree的一部分；
+  - 但是所有的reducer都应该是纯函数，不能产生任何的副作用；
+
+### Redux 结构划分
+- 不同文件做不同的事情
+  - store/index.js
+  - store/reducer.js
+  - store/actionCreators.js
+  - store/constants.js
+
+##
+
+## 
+
+##
+
+##
+
+## 
+
+##
+
+##
+
 ## portals和fragment
 
 ## StrictMode严格模式
 
 ## 其他 
+
 ### 虚拟 DOM **（待补充）**
 - 虚拟dom的作用
   - 虚拟DOM diff
   - 跨平台渲染
   - 声明式编程
   - 
+
 ### PWA 介绍
+
 - 概念
   - PWA全称Progressive Web App，即渐进式WEB应用
   - 一个 PWA 应用首先是一个网页可以通过 Web 技术编写出一个网页应用
@@ -2626,7 +2683,24 @@ export default App;
   - 实现了消息推送
   - 等等一系列类似于Native App相关的功能
 
+### JavaScript纯函数概念
+
+- 函数式编程中有一个非常重要的概念叫纯函数， JavaScript符合函数式编程的范式，所以也有纯函数的概念；
+- 比如react中组件就被要求像是一个纯函数（为什么是像，因为还有class组件）， redux中有一个reducer的概念，也是要求必须是一个纯函数
+- 纯函数定义
+  - 确定的输入，一定会产生确定的输出
+  - 函数在执行过程中，不能产生副作用 (**副作用解释：表示在执行一个函数时，除了返回函数值之外，还对调用函数产生了附加的影响，比如修改了全局变量， 修改参数或者改变外部的存储**)
+  - 函数的输出和输入值以外的其他隐藏信息或状态无关，也和由I/O设备产生的外部输出无关
+- 纯函数举例：
+  - 纯函数： slice截取数组时不会对原数组进行任何操作,而是生成一个新的数组
+  - 非纯函数： splice截取数组, 会返回一个新的数组, 也会对原数组进行修改；
+- 纯函数的作用与优势
+  - 在写的时候保证了函数的纯度，只是单纯实现自己的业务逻辑即可， 不需要关心传入的内容是如何获得的或者依赖其他的外部变量是否已经发生了修改；
+  - 在用的时候，你确定你的输入内容不会被任意篡改，并且自己确定的输入，一定会有确定的输出；
+  - React中就要求我们无论是函数还是class声明一个组件，这个组件都必须像纯函数一样， 保护它们的props不被修改
+
 ### React 脚手架中的 webpack
+
 - React脚手架将webpack相关的配置隐藏起来了
 - 如果希望看到webpack的配置信息
   - 执行 package.json 文件中的一个脚本: `"eject":"react-scripts eject"`
