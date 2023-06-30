@@ -2643,9 +2643,143 @@ export default App;
   - store/actionCreators.js
   - store/constants.js
 
-##
+### react-redux 库使用
+- redux和react没有直接的关系，你完全可以在React, Angular, Ember, jQuery, or vanilla JavaScript中使用Redux
 
-## 
+## react-router
+
+### 基本使用
+
+- 安装 `npm install react-router-dom`
+
+
+#### 示例
+
+- 路由形式
+  - HashRouter hash形式
+  - BrowserRouter History形式
+- 路由映射配置 element={<Home />} :`<Route path="/home" element={<Home />} />`
+
+```js
+// index.js
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
+import reportWebVitals from './reportWebVitals'
+
+// 引入两种路由 HashRouter 和 BrowserRouter
+import { HashRouter, BrowserRouter } from 'react-router-dom'
+const root = ReactDOM.createRoot(document.getElementById('root'))
+root.render(
+  <React.StrictMode>
+    {/* 全局使用路由 */}
+    <HashRouter>
+      <App />
+    </HashRouter>
+  </React.StrictMode>
+)
+reportWebVitals()
+
+
+// App.jsx
+import { Routes, Route, Link, NavLink } from "react-router-dom";
+import Home from "./pages/Home";
+import About from "./pages/About";
+// import "./index.css";
+function App() {
+  return (
+    <div className="App">
+      <header>
+        <h1>header</h1>
+        <div className="header">
+          {/* <Link to="/home">首页</Link>
+          <Link to="/about">关于</Link> */}
+          {/* <NavLink to="/home">首页</NavLink>
+          <NavLink to="/about">关于</NavLink> */}
+
+          <NavLink to="/home" style={({isActive})=>({color:isActive?'red':''})}>首页</NavLink>
+          <NavLink to="/about" style={({isActive})=>({color:isActive?'red':''})}>关于</NavLink>
+
+           {/* navLink 默认选中添加的类名为 active 可以进行修改 */}
+          <NavLink to="/home" className={({ isActive})=>isActive?'link-active':''}>首页</NavLink>
+          <NavLink to="/about" className={({ isActive})=>isActive?'link-active':''}>关于</NavLink>
+        </div>
+      </header>
+      <main>
+        <h1>main</h1>
+        {/* 路由映射配置 */}
+        <Routes>
+          <Route path="/home" element={<Home />} />
+          <Route path="/about" element={<About />} />
+        </Routes>
+      </main>
+      <footer>
+        <h1>footer</h1>
+      </footer>
+    </div>
+  );
+}
+export default App;
+
+```
+
+### 路由配置
+
+- 路由重定向
+  ```jsx
+  import { Routes, Route, Link, NavLink,Navigate } from "react-router-dom";
+
+  <Route path="/" element={<Navigate to="/about"/>} /> // / 重定向到 /about
+  <Route path="/home" element={<Home />} />
+  <Route path="/about" element={<About />} />
+  ```
+- notFound 配置
+  ```js
+  <Route path="*" element={<NotFound />} />
+  ```
+- 嵌套路由
+  - ` <Outlet/>` 路由占位符 同于vue中 `<router-view />`
+  ```jsx
+  // App.jsx
+  <Routes>
+    <Route path="/home" element={<Home />} >
+    <Route path="/home"  element={<Navigate to="/home/homeSon" />}/>
+      <Route path="/home/homeSon" element={<HomeSon />} />
+    </Route>
+  </Routes>
+
+  // Home.jsx
+  import React, { PureComponent } from 'react'
+  import { Outlet,Link } from "react-router-dom";
+  export class Home extends PureComponent {
+    render() {
+      return (
+        <div>
+          <h2>Home Page</h2>
+          <Outlet/> //路由占位符
+        </div>
+      )
+    }
+  }
+  export default Home
+  ```
+### 路由跳转
+
+- 声明式
+  - Link
+  - NavLink
+    - NavLink 方式 在当被选中的项 会给当前元素添加class类 `.active` (NavLink是在Link基础之上增加了一些样式属性)
+    - 类名 .active 可以进行修改
+  ```jsx
+  import { Routes, Route, Link, NavLink } from "react-router-dom";
+  <Link to="/home">首页</Link>
+  <NavLink to="/home">首页</NavLink>
+  ```
+- 编程式
+
+### 参数传递
+
+### 配置方式
 
 ##
 
