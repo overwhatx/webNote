@@ -2776,26 +2776,321 @@ export default App;
   <NavLink to="/home">首页</NavLink>
   ```
 - 编程式
+  - useNavigate 函数式组件可以直接调用
+    - 通过useNavigate的Hook获取到navigate对象
+    - ` const navigate = useNavigate();` 需要置于组件顶部
+    ```jsx
+    import {Routes,Route,Link,NavLink,Navigate,useNavigate,} from "react-router-dom";
+    import List from "./pages/List";
+    export function App(props) {
+      const navigate = useNavigate();
+     function navigateTo(path) {
+        console.log(path);
+        navigate(path);
+      }
+      return (
+        <div className="App">
+          <header>
+            <h1>header</h1>
+            <div className="header">
+              <button onClick={(e) => navigateTo("/list")}>List</button>
+            </div>
+          </header>
+          <main>
+            <h1>main</h1>
+            <Routes>
+              <Route path="/list" element={<List />} />
+            </Routes>
+          </main>
+        </div>
+        );
+    }
+    export default App;
+    ```
 
 ### 参数传递
 
 ### 配置方式
 
-##
+## hooks
 
-##
+- Hook 是 React 16.8 的新增特性，它可以让我们在不编写class的情况下使用state以及其他的React特性（比如生命周期）
+- Hook指的类似于useState、useEffect这样的函数 、Hooks是对这类函数的统称
 
-## 
+### class组件 和 function组件对比
 
-##
+- class组件可以定义自己的 state，用来保存组件自己内部的状态；
+  - 函数式组件不可以，因为函数每次调用都会产生新的临时变量；
+- class组件有自己的生命周期，可以在对应的生命周期中完成自己的逻辑；
+  - 比如在componentDidMount中发送网络请求，并且该生命周期函数只会执行一次；
+  - 函数式组件在学习hooks之前，如果在函数中发送网络请求，意味着每次重新渲染都会重新发送一次网络请求；
+- class组件可以在状态改变时只会重新执行render函数以及我们希望重新调用的生命周期函数componentDidUpdate等；
+  - 函数式组件在重新渲染时，整个函数都会被执行，似乎没有什么地方可以只让它们调用一次；
+- 案例对比：计数器
+```jsx
+// class组件
+import React, { PureComponent } from "react";
 
+export class CounterClass extends PureComponent {
+  constructor() {
+    super();
+    this.state = {
+      counter: 1,
+    };
+  }
+  increment() {
+    this.setState({
+      counter: this.state.counter + 1,
+    });
+  }
+  decrement() {
+    this.setState({
+      counter: this.state.counter - 1,
+    });
+  }
+  render() {
+    const { counter } = this.state;
+    return (
+      <div>
+        <h2>CounterClass</h2>
+        <h3>当前计数：{counter}</h3>
+        <button onClick={(e) => this.increment()}>+1</button>
+        <button onClick={(e) => this.decrement()}>-1</button>
+      </div>
+    );
+  }
+}
+
+export default CounterClass;
+
+```
+```jsx
+// 函数组件
+import React, { memo, useState } from "react";
+function CounterHook() {
+  const [counter, setCounter] = useState(0);
+  return (
+    <div>
+      <h2>CounterHook</h2>
+      <h3>当前计数：{counter}</h3>
+      <button onClick={(e) => setCounter(counter + 1)}>+1</button>
+      <button onClick={(e) => setCounter(counter - 1)}>-1</button>
+    </div>
+  );
+}
+export default memo(CounterHook);
+```
+
+### class组件存在的问题
+
+- 复杂组件变得难以理解
+  - 我们在最初编写一个class组件时，往往逻辑比较简单，并不会非常复杂。但是随着业务的增多，我们的class组件会变得越来越复杂；
+  - 比如componentDidMount中，可能就会包含大量的逻辑代码：包括网络请求、一些事件的监听（还需要在 componentWillUnmount中移除）；
+  - 而对于这样的class实际上非常难以拆分：因为它们的逻辑往往混在一起，强行拆分反而会造成过度设计，增加代码的复杂度；
+- 难以理解的class：
+  - 很多人发现学习ES6的class是学习React的一个障碍
+  - 比如在class中，我们必须搞清楚this的指向到底是谁，所以需要花很多的精力去学习this；
+  - 虽然我认为前端开发人员必须掌握this，但是依然处理起来非常麻烦；
+- 组件复用状态很难：
+  - 在前面为了一些状态的复用我们需要通过高阶组件；
+  - 像我们之前学习的redux中connect或者react-router中的withRouter，这些高阶组件设计的目的就是为了状态的复用；
+  - 或者类似于Provider、Consumer来共享一些状态，但是多次使用Consumer时，我们的代码就会存在很多嵌套；
+  - 这些代码让我们不管是编写和设计上来说，都变得非常困难；
+
+### Hook的出现带来哪些
+
+- Hook的出现，可以解决上面提到的这些问题；
+- 可以让我们在不编写class的情况下使用state以及其他的React特性；
+- Hook的使用场景：
+  - Hook的出现基本可以代替我们之前所有使用class组件的地方；
+  - 但是如果是一个旧的项目，你并不需要直接将所有的代码重构为Hooks，因为它完全向下兼容，你可以渐进式的来使用它；
+  - Hook只能在函数组件中使用，不能在类组件，或者函数组件之外的地方使用；
+- Hook 是：
+  - 完全可选的：你无需重写任何已有代码就可以在一些组件中尝试 Hook。但是如果你不想，你不必现在就去学习或使用 Hook。
+  - 100% 向后兼容的：Hook 不包含任何破坏性改动。
+
+### hook的使用
+
+```js
+import React, { memo, useState } from "react";
+function CounterHook() {
+  const [counter, setCounter] = useState(0);
+  return (
+    <div>
+      <h2>CounterHook</h2>
+      <h3>当前计数：{counter}</h3>
+      <button onClick={(e) => setCounter(counter + 1)}>+1</button>
+      <button onClick={(e) => setCounter(counter - 1)}>-1</button>
+    </div>
+  );
+}
+export default memo(CounterHook);
+```
+
+### hook Api
+- **只能在函数最外层调用 Hook。不要在循环、条件判断或者子函数中调用**
+- **只能在 React 的函数组件中调用 Hook。不要在其他 JavaScript 函数中调用**
+- useState useState来自react，需要从react中导入，它是一个hook；
+  - useState 是一种新方法，它与 class 里面的 this.state 提供的功能完全相同
+  - useState接受唯一一个参数，在第一次组件被调用时使用来作为初始化值。（如果没有传递参数，那么初始化值为undefined）
+  - useState的返回值是一个数组，我们可以通过数组的解构，来完成赋值会非常方便
+  - 参数：初始化值，如果不设置为undefined；
+  - 返回值：数组，包含两个元素；
+    - 元素一：当前状态的值（第一调用为初始化值）；
+    - 元素二：设置状态值的函数；
+- useEffect
+  ```jsx
+    import React, { memo, useState, useEffect } from "react";
+    const App = memo(() => {
+      const [counter, setCounter] = useState(0);
+      useEffect(() => {
+        // 当前出入的回调函数会在组件被渲染完成后自动执行
+        // 网络请求、dom操作、事件监听
+        document.title = counter;
+      });
+      return (
+        <div>
+          <h2>{counter}</h2>
+          <button onClick={(e) => setCounter(counter + 1)}>++</button>
+        </div>
+      );
+    });
+    export default App;
+    ```
+  - Effect Hook 可以让你来完成一些类似于class中生命周期的功能；
+  - 事实上，类似于网络请求、手动更新DOM、一些事件的监听，都是React更新DOM的一些副作用（Side Effects）；
+  - 所以对于完成这些功能的Hook被称之为 Effect Hook；
+  - 通过useEffect的Hook，可以告诉React需要在渲染后执行某些操作；
+  - useEffect要求我们传入一个回调函数，在React执行完更新DOM操作之后，就会回调这个函数；
+  - 默认情况下，无论是第一次渲染之后，还是每次更新之后，都会执行这个 回调函数；
+  - 清除Effect
+    ```jsx
+    useEffect(() => {
+    console.log("执行的操作");
+    // 返回值：回调函数=> 组件 被重新渲染或者组件卸载的时候执行
+    return () => {
+      console.log("卸载");
+    };
+    });
+    ```
+    - effect 可选的清除机制。每个 effect 都可以返回一个清除函数；
+    - 可以将添加和移除订阅的逻辑放在一起；
+    - 它们都属于 effect 的一部分；
+    - React 会在组件更新和卸载的时候执行清除操作；
+  - effect 的多个使用
+    ```jsx
+    import React, { memo, useState, useEffect } from "react";
+    const App = memo(() => {
+      const [counter, setCounter] = useState(0);
+      useEffect(() => {
+        console.log("第一个操作");
+        return () => {
+          console.log("卸载第一个操作");
+        };
+      });
+      useEffect(() => {
+        console.log("第二个操作");
+      });
+      useEffect(() => {
+        console.log("第三个操作");
+      });
+      return (
+        <div>
+          <h2>{counter}</h2>
+          <button onClick={(e) => setCounter(counter + 1)}>++</button>
+        </div>
+      );
+    });
+    export default App;
+    ```
+  - 执行时机 useEffect的第二个值 `useEffect(()=>{},[])` （指定useEffect在哪些state发生变化时，才重新执行；（受谁的影响））
+    - 如果一个函数我们不希望依赖任何的内容时，也可以传入一个空的数组 []
+    ```jsx
+    import React, { memo, useState, useEffect } from "react";
+    const App = memo(() => {
+      const [counter, setCounter] = useState(0);
+      const [message, setMessage] = useState('键盘敲烂');
+
+      useEffect(() => {
+        console.log("模拟监听");
+      },[counter]); //只有当 counter发生变化时才会执行该 useEffect
+
+      useEffect(() => {
+        console.log("第二个操作");
+        return () => {};
+      }, []);
+
+      useEffect(() => {
+        console.log("第三个操作");
+        return () => {};
+      }, []);
+
+      return (
+        <div>
+          <h2>{counter}</h2>
+          <h2>{message}</h2>
+          <button onClick={(e) => setCounter(counter + 1)}>++</button>
+          <button onClick={(e) => setMessage('月薪过万')}>message</button>
+
+        </div>
+      );
+    });
+    export default App;
+    ```
+- useContext
+  - 类组件可以通过 类名.contextType = MyContext方式，在类中获取context
+  - 多个Context或者在函数式组件中通过 MyContext.Consumer 方式共享context
+  - 但是多个Context共享时的方式会存在大量的嵌套
+  - Context Hook允许我们通过Hook来直接获取某个Context的值
+  - 当组件上层最近的 `<MyContext.Provider>` 更新时，该 Hook 会触发重新渲染，并使用最新传递给 MyContext provider 的 context value 值
+  ```jsx
+  // index.js
+  import React from 'react'
+  import ReactDOM from 'react-dom/client'
+  import App from './04_useContext/App'
+  //引入
+  import { UserContext, ThemeContext } from './04_useContext/context'
+  const root = ReactDOM.createRoot(document.getElementById('root'))
+  root.render(
+    <UserContext.Provider value={{ name: '张三', age: 18 }}>
+      <ThemeContext.Provider value={{ color: 'red', size: 10 }}>
+        <App />
+      </ThemeContext.Provider>
+    </UserContext.Provider>
+  )
+
+  //App.jsx
+  import React, { memo, useContext } from "react";
+  import { UserContext, ThemeContext } from "./context/index";
+  const App = memo(() => {
+    const user = useContext(UserContext);
+    const theme = useContext(ThemeContext);
+    return (
+      <div>
+        <div>use:{user.name}-{user.age}</div>
+        <div>theme:{theme.color}-{theme.size}</div>
+      </div>
+    );
+  });
+  export default App;
+
+  // context/index.js
+  import { createContext } from 'react'
+  const UserContext = createContext()
+  const ThemeContext = createContext()
+  export { UserContext, ThemeContext }
+
+  ```
+- useReduce
+- useCallback
+  - 性能优化点：当需要将一个函数传递给子组件时，最好使用useCallback进行优化，将优化之后的函数，传递给子组件
 ##
 
 ## portals和fragment
 
 ## StrictMode严格模式
 
-## 其他 
+## 其他
 
 ### 虚拟 DOM **（待补充）**
 - 虚拟dom的作用
