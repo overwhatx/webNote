@@ -2763,6 +2763,7 @@ export default App;
   }
   export default Home
   ```
+
 ### 路由跳转
 
 - 声明式
@@ -3084,6 +3085,107 @@ export default memo(CounterHook);
 - useReduce
 - useCallback
   - 性能优化点：当需要将一个函数传递给子组件时，最好使用useCallback进行优化，将优化之后的函数，传递给子组件
+
+### 数据以及方法的传递 示例
+- 示例1
+  ```js
+  // Test.jsx 组件
+  import React from "react";
+  function Test(props) {
+    const { title, changeTitle } = props;
+    return (
+      <>
+        <h1>{title}</h1>
+        <button onClick={changeTitle}>更改标题</button>
+      </>
+    );
+  }
+  export default Test;
+
+
+  // App.jsx
+  import { useState } from "react";
+  import Test from "./components/Test";
+  function App() {
+    const [title, setTitle] = useState("测试传递数据");
+    const changeTitle = () => {
+       setTitle("修改传递数据");
+    };
+    return (
+      <div className="App">
+        <Test title={title} changeTitle={changeTitle}></Test>
+      </div>
+    );
+  }
+  export default App;
+
+  ```
+
+- 示例2
+  ```js
+  // Test.jsx 组件
+  import React from "react";
+  function Test(props) {
+    const { title, changeTitle } = props;
+    return (
+      <>
+        <h1>{title}</h1>
+        <button onClick={()=>changeTitle('Test组件传递的数据')}>更改标题</button>
+      </>
+    );
+  }
+
+  export default Test;
+
+
+  // App.jsx
+  import { useState } from "react";
+  import Test from "./components/Test";
+  function App() {
+    const [title, setTitle] = useState("测试传递数据");
+    const changeTitle = (title) => {
+      setTitle(title);
+    };
+    return (
+      <div className="App">
+       <Test title={title} changeTitle={changeTitle}></Test>
+      </div>
+    );
+  }
+  export default App;
+  ```
+
+- 示例3
+  ```js
+  // Test.jsx 组件
+  import React from "react";
+  function Test(props) {
+    const { title, changeTitle } = props;
+    return (
+      <>
+        <h1>{title}</h1>
+        <button onClick={()=>changeTitle()}>更改标题</button>
+      </>
+    );
+  }
+
+  export default Test;
+
+
+  // App.jsx
+  import { useState } from "react";
+  import Test from "./components/Test";
+  function App() {
+    const [title, setTitle] = useState("测试传递数据");
+    return (
+      <div className="App">
+       <Test title={title} changeTitle={() => setTitle('直接修改')}></Test>
+      </div>
+    );
+  }
+  export default App;
+  ```
+
 ##
 
 ## portals和fragment
